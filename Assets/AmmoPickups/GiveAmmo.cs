@@ -7,6 +7,7 @@ public class GiveAmmo : MonoBehaviour
     // Start is called before the first frame update
     
     public FirstPersonCtrl ctrl;
+    public bool didGiveAmmo = false;
     void Start()
     {
         ctrl=GameObject.Find("Robot3").GetComponent<FirstPersonCtrl>();
@@ -18,12 +19,14 @@ public class GiveAmmo : MonoBehaviour
         
     }
 
-    void OnTriggerEnter()
+    private void OnTriggerEnter(Collider other)
     {
-        ctrl.ammoCount += 25;
-        Debug.Log("Added 10 Ammo!");
-        Destroy(this.gameObject);
+        if (other.CompareTag("Player") && !didGiveAmmo)
+        {
+            didGiveAmmo = true;
+            ctrl.ammoCount += 25;
+            Debug.Log("Added 25 Ammo!");
+            Destroy(this.gameObject);
+        }
     }
-
-
 }
