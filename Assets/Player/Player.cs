@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     //Grabbed References
-    private Transform TransformFeet;
-    private Transform TransformCamera;
+    private Transform Feet;
+    private Transform Camera;
     private Rigidbody Hitbox;
     private AudioSource SFXAudioSource;
+    public Canvas PlayerUI;
+    public RectTransform DashMeterBlue;
 
     //Assigned References
     public AudioClip audioClipDash;
@@ -25,10 +28,11 @@ public class Player : MonoBehaviour
     private Vector2 movement;
     private Vector2 mousePos;
     private LayerMask ground;
+    private float dashCharge = 1.0f;
 
     //Rotation
     private Quaternion zeroQuat = Quaternion.Euler(0f, 0f, 0f);
-    private const float QuakeSourceSens = 4.50f;
+    private static float QuakeSourceSens = 4.50f;
     private float DegreesPerPixel = QuakeSourceSens * 0.022f;
     private float lastXCoord;
     private float lastYCoord;
@@ -41,6 +45,44 @@ public class Player : MonoBehaviour
     void Awake()
     {
         controls = new EnforcersControls();
+        Transform[] allDescendants = GetComponentsInChildren<Transform>();
+
+        //Feet
+        for (int i = 0; i < allDescendants.Length; i++)
+        {
+            if (allDescendants[i].name == "Feet")
+            {
+                Feet = allDescendants[i];
+            }
+        }
+        //Camera
+        for (int i = 0; i < allDescendants.Length; i++)
+        {
+            if (allDescendants[i].name == "Camera")
+            {
+                Camera = allDescendants[i];
+            }
+        }
+        //PlayerUI
+        for (int i = 0; i < allDescendants.Length; i++)
+        {
+            if (allDescendants[i].name == "PlayerUI")
+            {
+                PlayerUI = allDescendants[i].GetComponent<Canvas>();
+            }
+        }
+        //DashMeterBlue
+        for (int i = 0; i < allDescendants.Length; i++)
+        {
+            if (allDescendants[i].name == "DashMeterBlue")
+            {
+                DashMeterBlue = allDescendants[i].GetComponent<RectTransform>();
+            }
+        }
+        //Hitbox
+        Hitbox = GetComponent<Rigidbody>();
+        //SFXAudioSource
+        SFXAudioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -62,26 +104,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        //TransformFeet
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            if (transform.GetChild(i).name == "Feet")
-            {
-                TransformFeet = transform.GetChild(i);
-            }
-        }
-        //TransformCamera
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            if (transform.GetChild(i).name == "Camera")
-            {
-                TransformCamera = transform.GetChild(i);
-            }
-        }
-        //Hitbox
-        Hitbox = GetComponent<Rigidbody>();
-        //SFXAudioSource
-        SFXAudioSource = GetComponent<AudioSource>();
+
     }
 
     void Update()
@@ -99,7 +122,7 @@ public class Player : MonoBehaviour
         }
 
         //Lock cursor
-        Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
 
         //Camera and player rotation
         float currX = mousePos.x;
@@ -112,8 +135,8 @@ public class Player : MonoBehaviour
         newRotPitch = newRotPitch < -90.0f ? -90.0f : newRotPitch;
         Quaternion horizontalRotation = Quaternion.Euler(0f, newRotYaw, 0f);
         Quaternion verticalRotation = Quaternion.Euler(-newRotPitch, 0f, 0f);
-        gameObject.transform.localRotation = horizontalRotation;
-        TransformCamera.localRotation = verticalRotation;
+        transform.localRotation = horizontalRotation;
+        Camera.localRotation = verticalRotation;
         lastXCoord = currX;
         lastYCoord = currY;
         lastRotYaw = newRotYaw;
@@ -124,6 +147,11 @@ public class Player : MonoBehaviour
         {
             hitbox.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y), ForceMode.VelocityChange);
         }*/
+
+        //Dash
+        dashCharge += Time.deltaTime / 3.0f;
+        dashCharge = dashCharge > 1.0f ? 1.0f : dashCharge;
+        DashMeterBlue.sizeDelta = new Vector2(320.0f*dashCharge, 20.0f);
     }
 
     private void OnWASD(InputAction.CallbackContext context)
@@ -156,14 +184,20 @@ public class Player : MonoBehaviour
             return;
         }
 
-        //Dash
-        Vector3 direction = new Vector3(movement.x, 0f, movement.y);
-        direction = direction.normalized;
-        Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * dashDistance);
-        Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * dashDistance);
+        //If we have enough charge
+        if (dashCharge >= 0.5f)
+        {
+            dashCharge -= 0.5f;
 
-        //Play SFX
-        SFXAudioSource.PlayOneShot(audioClipDash);
+            //Dash
+            Vector3 direction = new Vector3(movement.x, 0f, movement.y);
+            direction = direction.normalized;
+            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * dashDistance);
+            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * dashDistance);
+
+            //Play SFX
+            SFXAudioSource.PlayOneShot(audioClipDash);
+        }
     }
 
 }
