@@ -26,6 +26,8 @@ public class FirstPersonCtrl : MonoBehaviour
     public Transform bulletSpawn;
     public int ammoCount=25;
     public TextMeshProUGUI ammocnt;
+
+
     // Use this for initialization
     void Start()
     {
@@ -87,6 +89,13 @@ public class FirstPersonCtrl : MonoBehaviour
         }
         
     }
+
+    public void grounded()
+    {
+        speed= 0f;
+    }
+
+    
 
     
 }

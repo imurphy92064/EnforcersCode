@@ -21,7 +21,7 @@ public class SlowEnemy : MonoBehaviour
     public const float aggroSpeed = 5.0f;
     public const float manicSpeed = 10.0f;
     private const float maxHealth = 150.0f;
-    private const float timePerPatrolTargetChange = 1.7f;
+    private const float timePerPatrolTargetChange = 2.0f;
 
     private float health = maxHealth;
     private bool handldedEnemyDeath = false;
@@ -93,6 +93,8 @@ public class SlowEnemy : MonoBehaviour
 
     private void behaviorPatrol()
     {
+        Debug.Log("Patrolling!");
+        
         //Switch if we have to
         if (isInAggroRadius)
         {
@@ -113,6 +115,7 @@ public class SlowEnemy : MonoBehaviour
 
     private void behaviorAggroWalk()
     {
+        Debug.Log("Aggro!");
         //Switch if we have to
         if (!isInAggroRadius)
         {
@@ -135,6 +138,7 @@ public class SlowEnemy : MonoBehaviour
 
     private void behaviorManic()
     {
+        Debug.Log("Manic Mode!");
         //Switch if we have to
         if (!isInAggroRadius)
         {

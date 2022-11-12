@@ -19,11 +19,11 @@ public class LungeEnemy : MonoBehaviour
     //Const
     public const float patrollingSpeed = 3.0f;
     public const float aggroSpeed = 5.0f;
-    public const float lungingSpeed = 40.0f;
+    public const float lungingSpeed = 20.0f;
     private const float maxHealth = 100.0f;
-    private const float timePerPatrolTargetChange = 1.8f;
-    private const float timeLungeCharge = 0.5f;
-    private const float timeLungeDuration = 2.0f;
+    private const float timePerPatrolTargetChange = 2.0f;
+    private const float timeLungeCharge = 1.0f;
+    private const float timeLungeDuration = 3.0f;
 
     private float health = maxHealth;
     private bool handldedEnemyDeath = false;

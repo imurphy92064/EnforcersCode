@@ -19,7 +19,7 @@ public class Menu : MonoBehaviour {
 	
 	void OnGUI() {
 		if(GUI.Button(new Rect(origin_x, origin_y, buttonWidth, buttonHeight), "Start Campaign")) {
-			EnforcersSceneManager.changeScene("Level1");
+			Application.LoadLevel(2);
 		}
 		
 		if(GUI.Button(new Rect(origin_x, origin_y + buttonHeight  + 10, buttonWidth, buttonHeight), "Exit")) {
@@ -30,13 +30,29 @@ public class Menu : MonoBehaviour {
 			#endif
 		}
 		if(GUI.Button(new Rect(origin_x, origin_y + buttonHeight*2 + 20, buttonWidth, buttonHeight), "Level 1")) {
-            EnforcersSceneManager.changeScene("Level1");
-        }
+			Application.LoadLevel(2);
+		}
 		if(GUI.Button(new Rect(origin_x, origin_y + buttonHeight*3 + 30, buttonWidth, buttonHeight), "Level 2")) {
-            EnforcersSceneManager.changeScene("Level2");
-        }
+			Application.LoadLevel(3);
+		}
 		if(GUI.Button(new Rect(origin_x, origin_y + buttonHeight*4 + 40, buttonWidth, buttonHeight), "Level 3")) {
-            EnforcersSceneManager.changeScene("Level3");
-        }	
+			Application.LoadLevel(4);
+		}
+		
+	
+	
+	
+	
+	
 	}
 }
+
+
+
+
+
+
+
+
+
+

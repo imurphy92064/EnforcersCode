@@ -11,7 +11,7 @@ public class SpawnEnemies : MonoBehaviour
         if (other.tag == "Player")
         {
             EnemiesToSpawn.Invoke();
-            this.gameObject.SetActive(false);
+            //this.gameObject.SetActive(false);
         }
     }
 }

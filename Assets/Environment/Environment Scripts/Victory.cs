@@ -28,7 +28,7 @@ public class Victory : MonoBehaviour
         }
         else if(enem.Enemies.Count == 0 && other.tag == "Player")
         {
-            EnforcersSceneManager.changeScene("menu");
+            Application.LoadLevel(1);
         }
 
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class Victory03 : MonoBehaviour
+public class Victory02 : MonoBehaviour
 {
-     public TextMeshProUGUI gameend;
+    public TextMeshProUGUI gameend;
     private EnemyController enem;
     // Start is called before the first frame update
     void Start()
@@ -28,7 +28,12 @@ public class Victory03 : MonoBehaviour
         }
         else if(enem.Enemies.Count == 0 && other.tag == "Player")
         {
-            EnforcersSceneManager.changeScene("menu");
+            Application.LoadLevel(4);
         }
+
+
+
+
+
     }
 }

@@ -21,7 +21,7 @@ public class FastEnemy : MonoBehaviour
     public const float aggroSpeed = 7.0f;
     public const float manicSpeed = 14.0f;
     private const float maxHealth = 80.0f;
-    private const float timePerPatrolTargetChange = 1.9f;
+    private const float timePerPatrolTargetChange = 2.0f;
 
     private float health = maxHealth;
     private bool handldedEnemyDeath = false;
