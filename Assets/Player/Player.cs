@@ -12,23 +12,25 @@ public class Player : MonoBehaviour
     private Transform Camera;
     private Rigidbody Hitbox;
     private AudioSource SFXAudioSource;
-    public Canvas PlayerUI;
-    public RectTransform DashMeterBlue;
+    private Canvas PlayerUI;
+    private RectTransform DashMeterBlue;
+    private TextMeshProUGUI AmmoText;
+    private LayerMask ground;
 
     //Assigned References
     public AudioClip audioClipDash;
     public GameObject prefabBullet;
-    public TextMeshProUGUI ammocnt;
 
     //Player
-    private const float speed = 10f;
-    private const float jumpHeight = 3f;
-    private const float dashDistance = 8f;
+    private const float ConstSpeed = 10f;
+    private const float ConstJumpHeight = 3f;
+    private const float ConstDashDistance = 8f;
+    private const int ConstMaxJumps = 2;
+    private float dashCharge = 1.0f;
+    private int jumpCount = ConstMaxJumps;
     private EnforcersControls controls;
     private Vector2 movement;
     private Vector2 mousePos;
-    private LayerMask ground;
-    private float dashCharge = 1.0f;
 
     //Rotation
     private Quaternion zeroQuat = Quaternion.Euler(0f, 0f, 0f);
@@ -83,6 +85,10 @@ public class Player : MonoBehaviour
         Hitbox = GetComponent<Rigidbody>();
         //SFXAudioSource
         SFXAudioSource = GetComponent<AudioSource>();
+
+        //AmmoText
+        //Ground
+        ground = LayerMask.GetMask("Ground");
     }
 
     private void OnEnable()
@@ -102,11 +108,6 @@ public class Player : MonoBehaviour
         controls.Disable();
     }
 
-    void Start()
-    {
-
-    }
-
     void Update()
     {
         //WASD movement
@@ -114,11 +115,11 @@ public class Player : MonoBehaviour
         direction = direction.normalized;
         if (direction.x != 0)
         {
-            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * speed * Time.deltaTime);
+            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * ConstSpeed * Time.deltaTime);
         }
         if (direction.z != 0)
         {
-            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * speed * Time.deltaTime);
+            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * ConstSpeed * Time.deltaTime);
         }
 
         //Lock cursor
@@ -142,16 +143,16 @@ public class Player : MonoBehaviour
         lastRotYaw = newRotYaw;
         lastRotPitch = newRotPitch;
 
-        /*bool isGrounded = Physics.CheckSphere(feet.position, 0.1f, ground, QueryTriggerInteraction.Ignore);
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            hitbox.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y), ForceMode.VelocityChange);
-        }*/
-
         //Dash
         dashCharge += Time.deltaTime / 3.0f;
         dashCharge = dashCharge > 1.0f ? 1.0f : dashCharge;
-        DashMeterBlue.sizeDelta = new Vector2(320.0f*dashCharge, 20.0f);
+        DashMeterBlue.sizeDelta = new Vector2(320.0f * dashCharge, 20.0f);
+
+        //Jump
+        if (Physics.CheckSphere(Feet.position, 0.1f, ground, QueryTriggerInteraction.Ignore))
+        {
+            jumpCount = ConstMaxJumps;
+        }
     }
 
     private void OnWASD(InputAction.CallbackContext context)
@@ -174,7 +175,13 @@ public class Player : MonoBehaviour
     }
     private void OnJump(InputAction.CallbackContext context)
     {
-        //
+        if (jumpCount > 0)
+        {
+            jumpCount--;
+            Vector3 oldVelocity = Hitbox.velocity;
+            Hitbox.velocity = new Vector3(oldVelocity.x, 0.0f, oldVelocity.z);
+            Hitbox.AddForce(Vector3.up * Mathf.Sqrt(ConstJumpHeight * -2f * Physics.gravity.y), ForceMode.VelocityChange);
+        }
     }
     private void OnDash(InputAction.CallbackContext context)
     {
@@ -192,8 +199,8 @@ public class Player : MonoBehaviour
             //Dash
             Vector3 direction = new Vector3(movement.x, 0f, movement.y);
             direction = direction.normalized;
-            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * dashDistance);
-            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * dashDistance);
+            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * ConstDashDistance);
+            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * ConstDashDistance);
 
             //Play SFX
             SFXAudioSource.PlayOneShot(audioClipDash);
