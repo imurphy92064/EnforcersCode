@@ -13,9 +13,13 @@ public class Player : MonoBehaviour
     private Rigidbody Hitbox;
     private AudioSource SFXAudioSource;
     private Canvas PlayerUI;
-    private RectTransform DashMeterBlue;
+    private RectTransform HPBarFill;
+    private RectTransform DashBarFill;
     private TextMeshProUGUI AmmoText;
-    private LayerMask ground;
+    private Image RedKey;
+    private Image GreenKey;
+    private Image BlueKey;
+    private LayerMask GroundLayer;
 
     //Assigned References
     public AudioClip audioClipDash;
@@ -47,48 +51,82 @@ public class Player : MonoBehaviour
     void Awake()
     {
         controls = new EnforcersControls();
-        Transform[] allDescendants = GetComponentsInChildren<Transform>();
+        Transform[] transforms = GetComponentsInChildren<Transform>();
 
         //Feet
-        for (int i = 0; i < allDescendants.Length; i++)
+        foreach (Transform transform in transforms)
         {
-            if (allDescendants[i].name == "Feet")
+            if (transform.name == "Feet")
             {
-                Feet = allDescendants[i];
+                Feet = transform;
             }
         }
         //Camera
-        for (int i = 0; i < allDescendants.Length; i++)
+        foreach (Transform transform in transforms)
         {
-            if (allDescendants[i].name == "Camera")
+            if (transform.name == "Camera")
             {
-                Camera = allDescendants[i];
+                Camera = transform;
             }
         }
         //PlayerUI
-        for (int i = 0; i < allDescendants.Length; i++)
+        foreach (Transform transform in transforms)
         {
-            if (allDescendants[i].name == "PlayerUI")
+            if (transform.name == "PlayerUI")
             {
-                PlayerUI = allDescendants[i].GetComponent<Canvas>();
+                PlayerUI = transform.GetComponent<Canvas>();
             }
         }
-        //DashMeterBlue
-        for (int i = 0; i < allDescendants.Length; i++)
+        //HPBarFill
+        foreach (Transform transform in transforms)
         {
-            if (allDescendants[i].name == "DashMeterBlue")
+            if (transform.name == "HPBarFill")
             {
-                DashMeterBlue = allDescendants[i].GetComponent<RectTransform>();
+                HPBarFill = transform.GetComponent<RectTransform>();
             }
         }
+        //DashBarFill
+        foreach (Transform transform in transforms)
+        {
+            if (transform.name == "DashBarFill")
+            {
+                DashBarFill = transform.GetComponent<RectTransform>();
+            }
+        }
+        //RedKey
+        foreach (Transform transform in transforms)
+        {
+            if (transform.name == "RedKey")
+            {
+                RedKey = transform.GetComponent<Image>();
+            }
+        }
+        //GreenKey
+        foreach (Transform transform in transforms)
+        {
+            if (transform.name == "GreenKey")
+            {
+                GreenKey = transform.GetComponent<Image>();
+            }
+        }
+        //BlueKey
+        foreach (Transform transform in transforms)
+        {
+            if (transform.name == "BlueKey")
+            {
+                BlueKey = transform.GetComponent<Image>();
+            }
+        }
+
         //Hitbox
         Hitbox = GetComponent<Rigidbody>();
         //SFXAudioSource
         SFXAudioSource = GetComponent<AudioSource>();
 
         //AmmoText
-        //Ground
-        ground = LayerMask.GetMask("Ground");
+
+        //GroundLayer
+        GroundLayer = LayerMask.GetMask("Ground");
     }
 
     private void OnEnable()
@@ -144,15 +182,19 @@ public class Player : MonoBehaviour
         lastRotPitch = newRotPitch;
 
         //Dash
-        dashCharge += Time.deltaTime / 3.0f;
+        dashCharge += Time.deltaTime / 4.0f;
         dashCharge = dashCharge > 1.0f ? 1.0f : dashCharge;
-        DashMeterBlue.sizeDelta = new Vector2(320.0f * dashCharge, 20.0f);
+        DashBarFill.sizeDelta = new Vector2(200.0f * dashCharge, 20.0f);
 
         //Jump
-        if (Physics.CheckSphere(Feet.position, 0.1f, ground, QueryTriggerInteraction.Ignore))
+        if (Physics.CheckSphere(Feet.position, 0.1f, GroundLayer, QueryTriggerInteraction.Ignore))
         {
             jumpCount = ConstMaxJumps;
         }
+
+        RedKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasRedKey ? 1.0f : 0.0f);
+        GreenKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasGreenKey ? 1.0f : 0.0f);
+        BlueKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasBlueKey ? 1.0f : 0.0f);
     }
 
     private void OnWASD(InputAction.CallbackContext context)
@@ -192,9 +234,9 @@ public class Player : MonoBehaviour
         }
 
         //If we have enough charge
-        if (dashCharge >= 0.5f)
+        if (dashCharge >= (1.0f / 3.0f))
         {
-            dashCharge -= 0.5f;
+            dashCharge -= (1.0f / 3.0f);
 
             //Dash
             Vector3 direction = new Vector3(movement.x, 0f, movement.y);
@@ -206,5 +248,4 @@ public class Player : MonoBehaviour
             SFXAudioSource.PlayOneShot(audioClipDash);
         }
     }
-
 }
