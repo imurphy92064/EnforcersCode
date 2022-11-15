@@ -8,11 +8,8 @@ using static UnityEngine.GraphicsBuffer;
 public class SlowEnemy : MonoBehaviour
 {
     public Transform PlayerTransform;
-    public GameObject explostion;
 
     private ScoreText toScore;
-    private Text healText;
-    private Image healBar;
     private UnityEngine.AI.NavMeshAgent agent;
     private EnemyController enemyController;
 
@@ -20,11 +17,8 @@ public class SlowEnemy : MonoBehaviour
     public const float patrollingSpeed = 3.0f;
     public const float aggroSpeed = 5.0f;
     public const float manicSpeed = 10.0f;
-    private const float maxHealth = 150.0f;
     private const float timePerPatrolTargetChange = 2.0f;
 
-    private float health = maxHealth;
-    private bool handldedEnemyDeath = false;
     private SlowEnemyModes currentMode = SlowEnemyModes.Patrol;
     private float timeElapsed = 0.0f;
     private Vector3 currentTarget;
@@ -35,8 +29,6 @@ public class SlowEnemy : MonoBehaviour
     void Start()
     {
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        healText = transform.Find("EnemyCanvas").Find("HealthBarText").GetComponent<Text>();
-        healBar = transform.Find("EnemyCanvas").Find("MaxHealthBar").Find("HealthBar").GetComponent<Image>();
         toScore = GameObject.Find("Score").GetComponent<ScoreText>();
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         currentTarget = transform.position;
@@ -68,33 +60,10 @@ public class SlowEnemy : MonoBehaviour
 
         //Walk to target
         agent.SetDestination(currentTarget);
-
-        //Update health
-        healText.text = health.ToString();
-        healBar.fillAmount = health / maxHealth;
-    }
-
-    void OnCollisionEnter(Collision col)
-    {
-        if (col.gameObject.tag == "Bullet")
-        {
-            health -= 10.0f;
-            if (health < 1.0f && !handldedEnemyDeath)
-            {
-                handldedEnemyDeath = true;
-                enemyController.RemoveEnemy();
-                Destroy(this);
-                Instantiate(explostion, transform.position, transform.rotation);
-                Destroy(gameObject);
-                toScore.addScore();
-            }
-        }
     }
 
     private void behaviorPatrol()
     {
-        Debug.Log("Patrolling!");
-        
         //Switch if we have to
         if (isInAggroRadius)
         {
@@ -115,7 +84,6 @@ public class SlowEnemy : MonoBehaviour
 
     private void behaviorAggroWalk()
     {
-        Debug.Log("Aggro!");
         //Switch if we have to
         if (!isInAggroRadius)
         {
@@ -138,7 +106,6 @@ public class SlowEnemy : MonoBehaviour
 
     private void behaviorManic()
     {
-        Debug.Log("Manic Mode!");
         //Switch if we have to
         if (!isInAggroRadius)
         {
@@ -179,7 +146,6 @@ public class SlowEnemy : MonoBehaviour
 
     public void keyCollected()
     {
-        Debug.Log("ZZZZZZZZZZZZZZZZZZZZZZZCallback was called!");
         wasKeyCollected = true;
     }
 }

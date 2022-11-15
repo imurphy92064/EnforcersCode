@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
-public class FirstPersonCtrl : MonoBehaviour
+public class FirstPersonController2 : MonoBehaviour
 {
+    
+   
     public float speed = 10f;
     public float jumpHeight = 3f;
     public LayerMask ground;
     public Transform feet;
+
 
     private Vector3 direction;
     private Rigidbody rbody;
@@ -20,7 +22,7 @@ public class FirstPersonCtrl : MonoBehaviour
     private float rotationY = 10f;
     private float rotationX = 0f;
     private List<GameObject> currentKeys;
-
+   
 
     public GameObject bulletPrefab;
     public Transform bulletSpawn;
@@ -33,7 +35,7 @@ public class FirstPersonCtrl : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
-        //ammocnt.text= "Current Ammo: "+ ammoCount;
+      //  ammocnt.text= "Current Ammo: "+ ammoCount;
     }
 
     // Update is called once per frame
@@ -65,14 +67,13 @@ public class FirstPersonCtrl : MonoBehaviour
             Fire();
         }
 
-        
     }
 
     void Fire()
     {
-
-
-        /*
+        
+        
+        
         if(ammoCount >= 0)
         {
             //ammocnt.text="Current Ammo: "+ammoCount.ToString();
@@ -87,7 +88,7 @@ public class FirstPersonCtrl : MonoBehaviour
         {
            //ammocnt.text= "Out Of Ammo! Find More Around The Map!";
         }
-        */
+        
     }
 
     public void grounded()
@@ -95,7 +96,7 @@ public class FirstPersonCtrl : MonoBehaviour
         speed= 0f;
     }
 
-    
+   
 
-    
+
 }

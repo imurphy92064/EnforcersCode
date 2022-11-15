@@ -9,13 +9,17 @@ public class Player : MonoBehaviour
 {
     //Grabbed References
     private Transform Feet;
-    private Transform Camera;
+    private Transform CameraRot;
     private Rigidbody Hitbox;
     private AudioSource SFXAudioSource;
     private Canvas PlayerUI;
-    private RectTransform HPBarFill;
-    private RectTransform DashBarFill;
+    private RectTransform HPBarFillRect;
+    private RectTransform DashBarFillRect;
+    private RectTransform ShieldMask;
+    private TextMeshProUGUI ShieldText;
     private TextMeshProUGUI AmmoText;
+    private Image HPBarFill;
+    private Image DashBarFill;
     private Image RedKey;
     private Image GreenKey;
     private Image BlueKey;
@@ -30,8 +34,8 @@ public class Player : MonoBehaviour
     private const float ConstJumpHeight = 3f;
     private const float ConstDashDistance = 8f;
     private const int ConstMaxJumps = 2;
-    private float dashCharge = 1.0f;
-    private int jumpCount = ConstMaxJumps;
+    public int jumpCount = ConstMaxJumps;
+    public bool isTouchingGround = false;
     private EnforcersControls controls;
     private Vector2 movement;
     private Vector2 mousePos;
@@ -45,77 +49,62 @@ public class Player : MonoBehaviour
     private float lastRotYaw;
     private float lastRotPitch;
 
+    //UI Consts
+    private readonly Color CooldownGray = new Color(172f / 255f, 164f / 255f, 104f / 255f);
+    private readonly Color ChargedYellow = new Color(255f / 255f, 227f / 255f, 0f / 255f);
+
     //Weapons
     private int ammoCount = 25;
 
     void Awake()
     {
+        //Controls
         controls = new EnforcersControls();
-        Transform[] transforms = GetComponentsInChildren<Transform>();
 
-        //Feet
-        foreach (Transform transform in transforms)
+        //References
+        Transform[] transforms = GetComponentsInChildren<Transform>();
+        foreach (Transform currTransform in transforms)
         {
-            if (transform.name == "Feet")
+            switch (currTransform.name)
             {
-                Feet = transform;
+                case "Feet":
+                    Feet = currTransform;
+                    break;
+                case "CameraRot":
+                    CameraRot = currTransform;
+                    break;
+                case "PlayerUI":
+                    PlayerUI = currTransform.GetComponent<Canvas>();
+                    break;
+                case "HPBarFill":
+                    HPBarFill = currTransform.GetComponent<Image>();
+                    HPBarFillRect = currTransform.GetComponent<RectTransform>();
+                    break;
+                case "DashBarFill":
+                    DashBarFill = currTransform.GetComponent<Image>();
+                    DashBarFillRect = currTransform.GetComponent<RectTransform>();
+                    break;
+                case "RedKey":
+                    RedKey = currTransform.GetComponent<Image>();
+                    break;
+                case "GreenKey":
+                    GreenKey = currTransform.GetComponent<Image>();
+                    break;
+                case "BlueKey":
+                    BlueKey = currTransform.GetComponent<Image>();
+                    break;
+                case "ShieldText":
+                    ShieldText = currTransform.GetComponent<TextMeshProUGUI>();
+                    break;
+                case "ShieldMask":
+                    ShieldMask = currTransform.GetComponent<RectTransform>();
+                    break;
             }
         }
-        //Camera
-        foreach (Transform transform in transforms)
+
+        if (CameraRot == null)
         {
-            if (transform.name == "Camera")
-            {
-                Camera = transform;
-            }
-        }
-        //PlayerUI
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "PlayerUI")
-            {
-                PlayerUI = transform.GetComponent<Canvas>();
-            }
-        }
-        //HPBarFill
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "HPBarFill")
-            {
-                HPBarFill = transform.GetComponent<RectTransform>();
-            }
-        }
-        //DashBarFill
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "DashBarFill")
-            {
-                DashBarFill = transform.GetComponent<RectTransform>();
-            }
-        }
-        //RedKey
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "RedKey")
-            {
-                RedKey = transform.GetComponent<Image>();
-            }
-        }
-        //GreenKey
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "GreenKey")
-            {
-                GreenKey = transform.GetComponent<Image>();
-            }
-        }
-        //BlueKey
-        foreach (Transform transform in transforms)
-        {
-            if (transform.name == "BlueKey")
-            {
-                BlueKey = transform.GetComponent<Image>();
-            }
+            Debug.LogWarning("bruh");
         }
 
         //Hitbox
@@ -138,7 +127,7 @@ public class Player : MonoBehaviour
         controls.Gameplay.Shoot.performed += OnShoot;
         controls.Gameplay.Reload.performed += OnReload;
         controls.Gameplay.Jump.performed += OnJump;
-        controls.Gameplay.Dash.performed += OnDash;
+        //controls.Gameplay.Dash.performed += OnDash;
     }
 
     private void OnDisable()
@@ -170,31 +159,39 @@ public class Player : MonoBehaviour
         float deltaY = currY - lastYCoord;
         float newRotYaw = deltaX * DegreesPerPixel + lastRotYaw;
         float newRotPitch = deltaY * DegreesPerPixel + lastRotPitch;
-        newRotPitch = newRotPitch > 90.0f ? 90.0f : newRotPitch;
-        newRotPitch = newRotPitch < -90.0f ? -90.0f : newRotPitch;
+        newRotPitch = newRotPitch > 90f ? 90f : newRotPitch;
+        newRotPitch = newRotPitch < -90f ? -90f : newRotPitch;
         Quaternion horizontalRotation = Quaternion.Euler(0f, newRotYaw, 0f);
         Quaternion verticalRotation = Quaternion.Euler(-newRotPitch, 0f, 0f);
         transform.localRotation = horizontalRotation;
-        Camera.localRotation = verticalRotation;
+        CameraRot.localRotation = verticalRotation;
         lastXCoord = currX;
         lastYCoord = currY;
         lastRotYaw = newRotYaw;
         lastRotPitch = newRotPitch;
 
+        //Check for ground
+        isTouchingGround = Physics.CheckSphere(Feet.position, 0.1f, GroundLayer, QueryTriggerInteraction.Ignore);
+
         //Dash
-        dashCharge += Time.deltaTime / 4.0f;
-        dashCharge = dashCharge > 1.0f ? 1.0f : dashCharge;
-        DashBarFill.sizeDelta = new Vector2(200.0f * dashCharge, 20.0f);
+        Globals.PlayerDash += Time.deltaTime / 1f;
+        Globals.PlayerDash = Globals.PlayerDash > 1f ? 1f : Globals.PlayerDash;
 
         //Jump
-        if (Physics.CheckSphere(Feet.position, 0.1f, GroundLayer, QueryTriggerInteraction.Ignore))
+        if (isTouchingGround)
         {
             jumpCount = ConstMaxJumps;
         }
 
-        RedKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasRedKey ? 1.0f : 0.0f);
-        GreenKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasGreenKey ? 1.0f : 0.0f);
-        BlueKey.color = new Color(1.0f, 1.0f, 1.0f, Globals.hasBlueKey ? 1.0f : 0.0f);
+        //Update UI
+        DashBarFillRect.sizeDelta = new Vector2(200f * Globals.PlayerDash, 20f);
+        DashBarFill.color = Globals.PlayerDash == 1f ? ChargedYellow : CooldownGray;
+        HPBarFillRect.sizeDelta = new Vector2(200f * ((float)Globals.PlayerHP / 100f), 20f);
+        ShieldText.text = Globals.PlayerHP.ToString();
+        ShieldMask.offsetMin = new Vector2(ShieldMask.offsetMin.x, -46f * (Globals.PlayerArmor / 100f));
+        RedKey.color = new Color(1f, 1f, 1f, Globals.hasRedKey ? 1f : 0f);
+        GreenKey.color = new Color(1f, 1f, 1f, Globals.hasGreenKey ? 1f : 0f);
+        BlueKey.color = new Color(1f, 1f, 1f, Globals.hasBlueKey ? 1f : 0f);
     }
 
     private void OnWASD(InputAction.CallbackContext context)
@@ -221,12 +218,14 @@ public class Player : MonoBehaviour
         {
             jumpCount--;
             Vector3 oldVelocity = Hitbox.velocity;
-            Hitbox.velocity = new Vector3(oldVelocity.x, 0.0f, oldVelocity.z);
+            Hitbox.velocity = new Vector3(oldVelocity.x, 0f, oldVelocity.z);
             Hitbox.AddForce(Vector3.up * Mathf.Sqrt(ConstJumpHeight * -2f * Physics.gravity.y), ForceMode.VelocityChange);
         }
     }
     private void OnDash(InputAction.CallbackContext context)
     {
+        /*
+        //Cubed Dash
         //If we are not pressing WASD
         if (movement.x == 0 && movement.y == 0)
         {
@@ -234,9 +233,9 @@ public class Player : MonoBehaviour
         }
 
         //If we have enough charge
-        if (dashCharge >= (1.0f / 3.0f))
+        if (Globals.PlayerDash >= (1f / 3f))
         {
-            dashCharge -= (1.0f / 3.0f);
+            Globals.PlayerDash -= (1f / 3f);
 
             //Dash
             Vector3 direction = new Vector3(movement.x, 0f, movement.y);
@@ -246,6 +245,6 @@ public class Player : MonoBehaviour
 
             //Play SFX
             SFXAudioSource.PlayOneShot(audioClipDash);
-        }
+        }*/
     }
 }
