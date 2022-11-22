@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class EnemyHPDamage : MonoBehaviour
 {
@@ -11,16 +12,21 @@ public class EnemyHPDamage : MonoBehaviour
     private Image HealthBar;
     private float health;
     private bool handldedEnemyDeath = false;
+    public EnemyController enemyController;
+    public ScoreText toScore;
 
     // Use this for initialization
     private void Start()
     {
         health = maxHealth;
+        enemyController= GameObject.Find("EnemyController").GetComponent<EnemyController>();
+        toScore= GameObject.Find("Score").GetComponent<ScoreText>();
+
         
         Transform[] transforms = GetComponentsInChildren<Transform>();
         foreach (Transform currTransform in transforms)
         {
-            switch (transform.name)
+            switch (currTransform.name)
             {
                 case "HealthBar":
                     HealthBar = currTransform.GetComponent<Image>();
@@ -46,6 +52,8 @@ public class EnemyHPDamage : MonoBehaviour
 
         if (health <= 0f && !handldedEnemyDeath)
         {
+            enemyController.RemoveEnemy();
+            toScore.addScore();
             handldedEnemyDeath = true;
             //Instantiate(explosion, transform.position, transform.rotation);
             Destroy(gameObject);

@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using TMPro;
 
-public class GunSystem : MonoBehaviour
+public class GunSystemS : MonoBehaviour
 {
     // Gun stats
     public int GunID;
@@ -31,8 +35,8 @@ public class GunSystem : MonoBehaviour
 
     //sound
     private AudioSource sound;
-   private AudioSource reloadsound0;
-   private AudioSource reloadsound1;
+    private AudioSource reloadsound0;
+    private AudioSource reloadsound1;
   
     public void Start()
     {
@@ -144,6 +148,8 @@ public class GunSystem : MonoBehaviour
            
             reloadsound1.Play();
         }
+        
+        
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
     }

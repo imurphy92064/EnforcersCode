@@ -11,8 +11,6 @@ public class FastEnemy : MonoBehaviour
     public GameObject explostion;
 
     private ScoreText toScore;
-    private Text healText;
-    private Image healBar;
     private UnityEngine.AI.NavMeshAgent agent;
     private EnemyController enemyController;
 
@@ -35,8 +33,6 @@ public class FastEnemy : MonoBehaviour
     void Start()
     {
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        healText = transform.Find("EnemyCanvas").Find("HealthBarText").GetComponent<Text>();
-        healBar = transform.Find("EnemyCanvas").Find("MaxHealthBar").Find("HealthBar").GetComponent<Image>();
         toScore = GameObject.Find("Score").GetComponent<ScoreText>();
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         currentTarget = transform.position;
@@ -68,10 +64,6 @@ public class FastEnemy : MonoBehaviour
 
         //Walk to target
         agent.SetDestination(currentTarget);
-
-        //Update health
-        healText.text = health.ToString();
-        healBar.fillAmount = health / maxHealth;
     }
 
     void OnCollisionEnter(Collision col)
@@ -175,7 +167,6 @@ public class FastEnemy : MonoBehaviour
 
     public void keyCollected()
     {
-        Debug.Log("ZZZZZZZZZZZZZZZZZZZZZZZCallback was called!");
         wasKeyCollected = true;
     }
 }

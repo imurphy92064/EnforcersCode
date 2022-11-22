@@ -31,6 +31,15 @@ public class ReStart : MonoBehaviour
         }
     }
 
+    public void EnableCursor()
+    {
+         //Lock cursor
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        Cursor.visible= true;
+        
+    
+    }
+
 
     public void restartGame(string name)
     {

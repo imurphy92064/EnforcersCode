@@ -12,8 +12,9 @@ public class playerKill : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        restart= GameObject.Find("Canvas/Restart").GetComponent<ReStart>();
         restart.enabled=false;
+        restart= GameObject.Find("Canvas/Restart").GetComponent<ReStart>();
+        
     }
 
     // Update is called once per frame

@@ -56,8 +56,24 @@ public class Player : MonoBehaviour
     //Weapons
     private int ammoCount = 25;
 
+    //DashVariables
+    [Header("DashVariables")]
+    public float dashForce;
+    public float dashUpWardForce;
+    public float dashDuration;
+
+    //Settings
+    [Header("Settings")]
+    public bool useCameraForward = true;
+    public bool allowAllDirections = true;
+    public bool disableGravity = false;
+    public bool resetVel = true;
+
     void Awake()
     {
+         //Lock cursor
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        
         //Controls
         controls = new EnforcersControls();
 
@@ -127,10 +143,10 @@ public class Player : MonoBehaviour
         controls.Gameplay.Shoot.performed += OnShoot;
         controls.Gameplay.Reload.performed += OnReload;
         controls.Gameplay.Jump.performed += OnJump;
-        //controls.Gameplay.Dash.performed += OnDash;
+        controls.Gameplay.Dash.performed += OnDash;
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         controls.Disable();
     }
@@ -149,8 +165,18 @@ public class Player : MonoBehaviour
             Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * ConstSpeed * Time.deltaTime);
         }
 
-        //Lock cursor
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        if(Input.GetKeyDown("escape"))
+        {
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            Cursor.visible= true;
+
+        }
+        if(Input.GetKeyDown("tab"))
+        {
+             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible= false;
+        }
+       
 
         //Camera and player rotation
         float currX = mousePos.x;
@@ -246,5 +272,52 @@ public class Player : MonoBehaviour
             //Play SFX
             SFXAudioSource.PlayOneShot(audioClipDash);
         }*/
+
+        //Bail if not enough charge
+        if (Globals.PlayerDash < 1.0f)
+        {
+            return;
+        }
+
+        //Subtract charge
+        Globals.PlayerDash -= 1.0f;
+
+        Transform forwardT;
+
+        if (useCameraForward)
+            forwardT = CameraRot;
+        else
+            forwardT = transform;
+
+        Vector3 direction = GetDirection(forwardT);
+        Vector3 forcetoApply = direction * dashForce + transform.up * dashUpWardForce;
+        if (disableGravity)
+            Hitbox.useGravity = false;
+        Hitbox.AddForce(forcetoApply, ForceMode.Impulse);
+        Invoke(nameof(ResetDash), dashDuration);
     }
+
+    private void ResetDash()
+    {
+        Hitbox.useGravity = true;
+    }
+
+    private Vector3 GetDirection(Transform forwardT)
+    {
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
+        Vector3 direction = new Vector3();
+        if (allowAllDirections)
+            direction = forwardT.forward * verticalInput + forwardT.right * horizontalInput;
+        else
+            direction = forwardT.forward;
+
+        if (verticalInput == 0 && horizontalInput == 0)
+            direction = forwardT.forward;
+        return direction.normalized;
+    }
+
+    
+
+
 }

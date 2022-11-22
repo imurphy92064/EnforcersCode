@@ -11,6 +11,8 @@ public class Menu : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		UnityEngine.Cursor.lockState = CursorLockMode.None;
+        Cursor.visible= true;
 		buttonWidth = 200;
 		buttonHeight = 50;
 		origin_x = Screen.width / 2 - buttonWidth / 2;
