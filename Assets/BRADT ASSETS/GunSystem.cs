@@ -8,6 +8,7 @@ public class GunSystem : MonoBehaviour
     // Gun stats
     public int GunID;
     public int damage;
+    public bool canZoom;
     public float timeBetweenShooting, spread, range, reloadTime, timeBetweenShots;
     public int magazineSize, bulletsPerTap;
     public bool allowButtonHold;
@@ -31,8 +32,8 @@ public class GunSystem : MonoBehaviour
 
     //sound
     private AudioSource sound;
-   private AudioSource reloadsound0;
-   private AudioSource reloadsound1;
+    public AudioClip reloadSound;
+    public AudioClip shootSound;
   
     public void Start()
     {
@@ -42,8 +43,6 @@ public class GunSystem : MonoBehaviour
         readyToShoot = true;
 
         sound= GetComponent<AudioSource>();
-        reloadsound0= GameObject.Find("ReloadAssault").GetComponent<AudioSource>();
-        reloadsound1= GameObject.Find("ReloadShotgun").GetComponent<AudioSource>();
         Recoil_Script = GameObject.Find("CameraRot/CameraRecoil").GetComponent<Recoil>();
     }
 
@@ -82,7 +81,7 @@ public class GunSystem : MonoBehaviour
 
     private void Shoot()
     {
-        sound.Play();
+        sound.PlayOneShot(shootSound);
         readyToShoot = false;
 
         // Spread
@@ -133,17 +132,7 @@ public class GunSystem : MonoBehaviour
 
     private void Reload()
     {
-        if(GunID == 0)
-        {
-            
-            reloadsound0.Play();
-
-        }
-        if(GunID ==1)
-        {
-           
-            reloadsound1.Play();
-        }
+        sound.PlayOneShot(reloadSound);
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
     }
