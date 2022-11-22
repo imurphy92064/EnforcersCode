@@ -53,9 +53,6 @@ public class Player : MonoBehaviour
     private readonly Color CooldownGray = new Color(172f / 255f, 164f / 255f, 104f / 255f);
     private readonly Color ChargedYellow = new Color(255f / 255f, 227f / 255f, 0f / 255f);
 
-    //Weapons
-    private int ammoCount = 25;
-
     //DashVariables
     [Header("DashVariables")]
     public float dashForce;
@@ -283,17 +280,22 @@ public class Player : MonoBehaviour
         Globals.PlayerDash -= 1.0f;
 
         Transform forwardT;
-
         if (useCameraForward)
+        {
             forwardT = CameraRot;
+        }
         else
+        {
             forwardT = transform;
-
+        }
         Vector3 direction = GetDirection(forwardT);
         Vector3 forcetoApply = direction * dashForce + transform.up * dashUpWardForce;
-        if (disableGravity)
+        Vector3 nerfedVerticalForce = new Vector3(forcetoApply.x, forcetoApply.y*0.5f, forcetoApply.z);
+        if(disableGravity)
+        {
             Hitbox.useGravity = false;
-        Hitbox.AddForce(forcetoApply, ForceMode.Impulse);
+        }
+        Hitbox.AddForce(nerfedVerticalForce, ForceMode.Impulse);
         Invoke(nameof(ResetDash), dashDuration);
     }
 
