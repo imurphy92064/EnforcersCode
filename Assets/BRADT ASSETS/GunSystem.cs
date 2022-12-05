@@ -88,7 +88,7 @@ public class GunSystem : MonoBehaviour
 
     public void TryReload()
     {
-        if (bulletsMag < magazineSize && !reloading)
+        if (bulletsMag < magazineSize && !reloading && bulletsReserve>0)
         {
             Reload();
         }
