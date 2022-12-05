@@ -11,7 +11,6 @@ public class Player : MonoBehaviour
     private Transform Feet;
     private Transform CameraRot;
     private Rigidbody Hitbox;
-    private AudioSource SFXAudioSource;
     private Canvas PlayerUI;
     private RectTransform HPBarFillRect;
     private RectTransform DashBarFillRect;
@@ -37,7 +36,8 @@ public class Player : MonoBehaviour
     private const float ConstDashDistance = 8f;
     private const int ConstMaxJumps = 2;
     private int jumpCount = ConstMaxJumps;
-    private bool isTouchingGround = false;
+    private bool isTouchingGroundLastFrame = false;
+    private bool isTouchingGroundThisFrame = false;
     private bool isShooting = false;
     private EnforcersControls controls;
     private Vector2 movement;
@@ -45,8 +45,8 @@ public class Player : MonoBehaviour
 
     //Rotation
     private Quaternion zeroQuat = Quaternion.Euler(0f, 0f, 0f);
-    private static float QuakeSourceSens = 4.50f;
-    private float DegreesPerPixel = QuakeSourceSens * 0.022f;
+    private float QuakeSourceSens;
+    private float DegreesPerPixel;
     private float lastXCoord;
     private float lastYCoord;
     private float lastRotYaw;
@@ -71,8 +71,12 @@ public class Player : MonoBehaviour
 
     void Awake()
     {
-        //Controls
-        controls = new EnforcersControls();
+        //Grab sens
+        QuakeSourceSens = Sensitivity.getSensitivity();
+        DegreesPerPixel = QuakeSourceSens * 0.022f;
+
+    //Controls
+    controls = new EnforcersControls();
 
         //References
         Transform[] transforms = GetComponentsInChildren<Transform>();
@@ -124,8 +128,6 @@ public class Player : MonoBehaviour
         playerHP = GetComponent<PlayerHP>();
         //Hitbox
         Hitbox = GetComponent<Rigidbody>();
-        //SFXAudioSource
-        SFXAudioSource = GetComponent<AudioSource>();
         //GroundLayer
         GroundLayer = LayerMask.GetMask("Ground");
     }
@@ -190,18 +192,17 @@ public class Player : MonoBehaviour
         lastRotYaw = newRotYaw;
         lastRotPitch = newRotPitch;
 
-        //Check for ground
-        isTouchingGround = Physics.CheckSphere(Feet.position, 0.5f, GroundLayer, QueryTriggerInteraction.Ignore);
-
         //Dash
         Globals.PlayerDash += Time.deltaTime / 1f;
         Globals.PlayerDash = Globals.PlayerDash > 1f ? 1f : Globals.PlayerDash;
 
         //Jump
-        if (isTouchingGround)
+        isTouchingGroundThisFrame = Physics.CheckSphere(Feet.position, 0.5f, GroundLayer, QueryTriggerInteraction.Ignore);
+        if (isTouchingGroundThisFrame&&!isTouchingGroundLastFrame)
         {
             jumpCount = ConstMaxJumps;
         }
+        isTouchingGroundLastFrame = isTouchingGroundThisFrame;
 
         //Fire
         if (isShooting)
