@@ -211,10 +211,18 @@ public class Player : MonoBehaviour
         }
 
         //Update UI
+        float playerHPPercent = (float)playerHP.health / (float)playerHP.MaxHealth;
+        float playerShieldPercent = (float)playerHP.shield / (float)playerHP.MaxShield;
         DashBarFillRect.sizeDelta = new Vector2(200f * Globals.PlayerDash, 20f);
         DashBarFill.color = Globals.PlayerDash == 1f ? ChargedYellow : CooldownGray;
-        HPBarFillRect.sizeDelta = new Vector2(200f * ((float)playerHP.health / 100f), 20f);
+        HPBarFillRect.sizeDelta = new Vector2(200f * playerHPPercent, 20f);
+        float ShieldTextR = ((016f / 255f) * (0 + playerShieldPercent)) + ((255f / 255f) * (1 - playerShieldPercent));
+        float ShieldTextG = ((195f / 255f) * (0 + playerShieldPercent)) + ((255f / 255f) * (1 - playerShieldPercent));
+        float ShieldTextB = ((024f / 255f) * (0 + playerShieldPercent)) + ((255f / 255f) * (1 - playerShieldPercent));
+        float ShieldTextA = ((255f / 255f) * (0 + playerShieldPercent)) + ((110f / 255f) * (1 - playerShieldPercent));
         ShieldText.text = playerHP.shield.ToString();
+        ShieldText.color = new Color(ShieldTextR, ShieldTextG, ShieldTextB);
+        ShieldText.alpha = ShieldTextA;
         ShieldMask.offsetMin = new Vector2(ShieldMask.offsetMin.x, -46f * (playerHP.shield / 100f));
         RedKey.color = new Color(1f, 1f, 1f, Globals.hasRedKey ? 1f : 0f);
         GreenKey.color = new Color(1f, 1f, 1f, Globals.hasGreenKey ? 1f : 0f);
