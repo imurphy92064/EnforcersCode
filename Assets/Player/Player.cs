@@ -24,6 +24,8 @@ public class Player : MonoBehaviour
     private Image GreenKey;
     private Image BlueKey;
     private LayerMask GroundLayer;
+    public PlayerHP playerHP;
+    public WeaponSwitching weaponSwitching;
 
     //Assigned References
     public AudioClip audioClipDash;
@@ -34,8 +36,9 @@ public class Player : MonoBehaviour
     private const float ConstJumpHeight = 3f;
     private const float ConstDashDistance = 8f;
     private const int ConstMaxJumps = 2;
-    public int jumpCount = ConstMaxJumps;
-    public bool isTouchingGround = false;
+    private int jumpCount = ConstMaxJumps;
+    private bool isTouchingGround = false;
+    private bool isShooting = false;
     private EnforcersControls controls;
     private Vector2 movement;
     private Vector2 mousePos;
@@ -68,9 +71,6 @@ public class Player : MonoBehaviour
 
     void Awake()
     {
-         //Lock cursor
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        
         //Controls
         controls = new EnforcersControls();
 
@@ -82,6 +82,9 @@ public class Player : MonoBehaviour
             {
                 case "Feet":
                     Feet = currTransform;
+                    break;
+                case "Player":
+                    currTransform.GetComponent<MeshRenderer>().enabled = false;
                     break;
                 case "CameraRot":
                     CameraRot = currTransform;
@@ -112,21 +115,17 @@ public class Player : MonoBehaviour
                 case "ShieldMask":
                     ShieldMask = currTransform.GetComponent<RectTransform>();
                     break;
+                case "WeaponHolder":
+                    weaponSwitching = currTransform.GetComponent<WeaponSwitching>();
+                    break;
             }
         }
-
-        if (CameraRot == null)
-        {
-            Debug.LogWarning("bruh");
-        }
-
+        //PlayerHP
+        playerHP = GetComponent<PlayerHP>();
         //Hitbox
         Hitbox = GetComponent<Rigidbody>();
         //SFXAudioSource
         SFXAudioSource = GetComponent<AudioSource>();
-
-        //AmmoText
-
         //GroundLayer
         GroundLayer = LayerMask.GetMask("Ground");
     }
@@ -136,8 +135,9 @@ public class Player : MonoBehaviour
         controls.Enable();
         controls.Gameplay.WASD.performed += OnWASD;
         controls.Gameplay.WASD.canceled += OnWASD;
-        controls.Gameplay.MouseMove.performed += OnMouseMove;
         controls.Gameplay.Shoot.performed += OnShoot;
+        controls.Gameplay.Shoot.canceled += OnShoot;
+        controls.Gameplay.MouseMove.performed += OnMouseMove;
         controls.Gameplay.Reload.performed += OnReload;
         controls.Gameplay.Jump.performed += OnJump;
         controls.Gameplay.Dash.performed += OnDash;
@@ -162,18 +162,15 @@ public class Player : MonoBehaviour
             Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * ConstSpeed * Time.deltaTime);
         }
 
-        if(Input.GetKeyDown("escape"))
+        //Lock and unlock cursor
+        if (Input.GetKeyDown("escape"))
         {
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
-            Cursor.visible= true;
-
+            UnlockCursor();
         }
-        if(Input.GetKeyDown("tab"))
+        if (Input.GetKeyDown("tab"))
         {
-             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible= false;
+            LockCursor();
         }
-       
 
         //Camera and player rotation
         float currX = mousePos.x;
@@ -194,7 +191,7 @@ public class Player : MonoBehaviour
         lastRotPitch = newRotPitch;
 
         //Check for ground
-        isTouchingGround = Physics.CheckSphere(Feet.position, 0.1f, GroundLayer, QueryTriggerInteraction.Ignore);
+        isTouchingGround = Physics.CheckSphere(Feet.position, 0.5f, GroundLayer, QueryTriggerInteraction.Ignore);
 
         //Dash
         Globals.PlayerDash += Time.deltaTime / 1f;
@@ -206,35 +203,51 @@ public class Player : MonoBehaviour
             jumpCount = ConstMaxJumps;
         }
 
+        //Fire
+        if (isShooting)
+        {
+            weaponSwitching.gunSystems[weaponSwitching.selectedWeapon].TryShoot();
+        }
+
         //Update UI
         DashBarFillRect.sizeDelta = new Vector2(200f * Globals.PlayerDash, 20f);
         DashBarFill.color = Globals.PlayerDash == 1f ? ChargedYellow : CooldownGray;
-        HPBarFillRect.sizeDelta = new Vector2(200f * ((float)Globals.PlayerHP / 100f), 20f);
-        ShieldText.text = Globals.PlayerHP.ToString();
-        ShieldMask.offsetMin = new Vector2(ShieldMask.offsetMin.x, -46f * (Globals.PlayerArmor / 100f));
+        HPBarFillRect.sizeDelta = new Vector2(200f * ((float)playerHP.health / 100f), 20f);
+        ShieldText.text = playerHP.shield.ToString();
+        ShieldMask.offsetMin = new Vector2(ShieldMask.offsetMin.x, -46f * (playerHP.shield / 100f));
         RedKey.color = new Color(1f, 1f, 1f, Globals.hasRedKey ? 1f : 0f);
         GreenKey.color = new Color(1f, 1f, 1f, Globals.hasGreenKey ? 1f : 0f);
         BlueKey.color = new Color(1f, 1f, 1f, Globals.hasBlueKey ? 1f : 0f);
+
+        //Check for death
+        if (playerHP.didHandleDeath)
+        {
+            controls.Disable();
+        }
     }
 
     private void OnWASD(InputAction.CallbackContext context)
     {
         movement = context.ReadValue<Vector2>();
     }
+
     private void OnMouseMove(InputAction.CallbackContext context)
     {
         Vector2 delta = context.ReadValue<Vector2>();
         mousePos.x += delta.x;
         mousePos.y += delta.y;
     }
+
     private void OnShoot(InputAction.CallbackContext context)
     {
-        //
+        isShooting = !context.canceled;
     }
+
     private void OnReload(InputAction.CallbackContext context)
     {
-        //
+        weaponSwitching.gunSystems[weaponSwitching.selectedWeapon].TryReload();
     }
+
     private void OnJump(InputAction.CallbackContext context)
     {
         if (jumpCount > 0)
@@ -247,29 +260,6 @@ public class Player : MonoBehaviour
     }
     private void OnDash(InputAction.CallbackContext context)
     {
-        /*
-        //Cubed Dash
-        //If we are not pressing WASD
-        if (movement.x == 0 && movement.y == 0)
-        {
-            return;
-        }
-
-        //If we have enough charge
-        if (Globals.PlayerDash >= (1f / 3f))
-        {
-            Globals.PlayerDash -= (1f / 3f);
-
-            //Dash
-            Vector3 direction = new Vector3(movement.x, 0f, movement.y);
-            direction = direction.normalized;
-            Hitbox.MovePosition(Hitbox.position + transform.right * direction.x * ConstDashDistance);
-            Hitbox.MovePosition(Hitbox.position + transform.forward * direction.z * ConstDashDistance);
-
-            //Play SFX
-            SFXAudioSource.PlayOneShot(audioClipDash);
-        }*/
-
         //Bail if not enough charge
         if (Globals.PlayerDash < 1.0f)
         {
@@ -290,8 +280,8 @@ public class Player : MonoBehaviour
         }
         Vector3 direction = GetDirection(forwardT);
         Vector3 forcetoApply = direction * dashForce + transform.up * dashUpWardForce;
-        Vector3 nerfedVerticalForce = new Vector3(forcetoApply.x, forcetoApply.y*0.5f, forcetoApply.z);
-        if(disableGravity)
+        Vector3 nerfedVerticalForce = new Vector3(forcetoApply.x, forcetoApply.y * 0.5f, forcetoApply.z);
+        if (disableGravity)
         {
             Hitbox.useGravity = false;
         }
@@ -319,7 +309,15 @@ public class Player : MonoBehaviour
         return direction.normalized;
     }
 
-    
+    public static void LockCursor()
+    {
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
 
-
+    public static void UnlockCursor()
+    {
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 }

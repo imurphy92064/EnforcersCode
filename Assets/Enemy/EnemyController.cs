@@ -22,7 +22,7 @@ public class EnemyController : MonoBehaviour
     {
         if (Enemies.Count == 0)
         {
-            enemyCounter.text = "All Enemies Defeated!";
+            enemyCounter.text = "Find Your Way To The End of The Level!";
         }
     }
 

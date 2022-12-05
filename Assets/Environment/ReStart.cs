@@ -6,46 +6,30 @@ using UnityEngine.SceneManagement;
 public class ReStart : MonoBehaviour
 {
     private int origin_x;
-	private int origin_y;
+    private int origin_y;
     public int buttonWidth;
-	public int buttonHeight;
+    public int buttonHeight;
 
     // Start is called before the first frame update
     void Start()
     {
         buttonWidth = 200;
-		buttonHeight = 50;
+        buttonHeight = 50;
         origin_x = Screen.width / 2;
-		origin_y = Screen.height / 2 ;
+        origin_y = Screen.height / 2;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnGUI()
     {
-        
-    }
-
-    void OnGUI(){
-        if(GUI.Button(new Rect(origin_x-120, origin_y, 200, 50), "Restart")){
-           SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (GUI.Button(new Rect(origin_x - 120, origin_y, 200, 50), "Restart"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Player.LockCursor();
         }
     }
-
-    public void EnableCursor()
-    {
-         //Lock cursor
-        UnityEngine.Cursor.lockState = CursorLockMode.None;
-        Cursor.visible= true;
-        
-    
-    }
-
 
     public void restartGame(string name)
     {
         Application.LoadLevel(name);
     }
-
-
-
-    }
+}

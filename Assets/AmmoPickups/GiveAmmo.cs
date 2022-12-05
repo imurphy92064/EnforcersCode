@@ -11,11 +11,14 @@ public class GiveAmmo : MonoBehaviour
         if (other.CompareTag("Player") && !didGiveAmmo)
         {
             didGiveAmmo = true;
-            for (int i = 0; i < 3; i++)
-            {
-                Globals.ReserveAmmoCount[i] += 25;
-            }
-            //Debug.Log("Added 25 Ammo!");
+           
+                //Get player script
+                var Player = other.GetComponent<Player>();
+                foreach (GunSystem gun in Player.weaponSwitching.gunSystems)
+                {
+                    gun.bulletsReserve += 25;
+                }
+            
             Destroy(this.gameObject);
         }
     }
