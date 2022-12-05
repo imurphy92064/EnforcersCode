@@ -26,7 +26,6 @@ public class GunSystem : MonoBehaviour
     private bool reloading = false;
 
     private const float TracerSpeed = 300f;
-    private int ghetto = 0;
 
     //Reference
     public Transform BulletDirectionTransform;
@@ -46,7 +45,6 @@ public class GunSystem : MonoBehaviour
     private Recoil Recoil_Script;
 
     //Sound
-    private AudioSource sound;
     public AudioClip reloadSound;
     public AudioClip shootSound;
 
@@ -58,7 +56,6 @@ public class GunSystem : MonoBehaviour
         LayerEnemy = LayerMask.NameToLayer("Enemy");
 
         bulletsMag = magazineSize;
-        sound = GetComponent<AudioSource>();
         Recoil_Script = GameObject.Find("CameraRot/CameraRecoil").GetComponent<Recoil>();
     }
 
@@ -78,14 +75,7 @@ public class GunSystem : MonoBehaviour
         {
             bulletsShotInThisBurst = bulletsPerTap;
             
-            //Play sound
-            ghetto++;
-            if (ghetto >= 20)
-            {
-                ghetto = 0;
-                sound.Stop();
-            }
-            sound.PlayOneShot(shootSound);
+            AudioPool.playSound(shootSound,transform);
 
             //Fire
             Shoot();
@@ -262,7 +252,7 @@ public class GunSystem : MonoBehaviour
 
     private void Reload()
     {
-        sound.PlayOneShot(reloadSound);
+        AudioPool.playSound(reloadSound,transform);
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
     }
