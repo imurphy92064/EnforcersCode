@@ -8,7 +8,7 @@ using System.Net;
 public class GunSystem : MonoBehaviour
 {
     //Gun stats
-    public int GunID;
+    public GunType gunType;
     public int damage;
     public bool canZoom;
     public float timeBetweenShooting;
@@ -266,5 +266,13 @@ public class GunSystem : MonoBehaviour
         bulletsMag += bulletsThatCanBeAdded;
         bulletsReserve -= bulletsThatCanBeAdded;
         reloading = false;
+    }
+
+    public enum GunType
+    {
+        Pistol,
+        AssultRifle,
+        Shotgun,
+        Sniper
     }
 }

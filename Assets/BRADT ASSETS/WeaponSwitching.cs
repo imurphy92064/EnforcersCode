@@ -68,11 +68,17 @@ public class WeaponSwitching : MonoBehaviour
         {
             if (Input.GetKeyDown(keys[i]) && timeSinceLastSwitch >= switchTime)
             {
-                selectedWeapon = i;
+                if (hasWeapon(gunSystems[i].gunType))
+                {
+                    selectedWeapon = i;
+                }
             }
         }
 
-        if (previousSelectedWeapon != selectedWeapon) Select(selectedWeapon);
+        if (previousSelectedWeapon != selectedWeapon)
+        {
+            Select(selectedWeapon);
+        }
 
         timeSinceLastSwitch += Time.deltaTime;
     }
@@ -85,5 +91,22 @@ public class WeaponSwitching : MonoBehaviour
         }
 
         timeSinceLastSwitch = 0f;
+    }
+
+    private bool hasWeapon(GunSystem.GunType gunType)
+    {
+        switch (gunType)
+        {
+            case GunSystem.GunType.Pistol:
+                return Globals.hasPistol;
+            case GunSystem.GunType.AssultRifle:
+                return Globals.hasAssultRifle;
+            case GunSystem.GunType.Shotgun:
+                return Globals.hasShotgun;
+            case GunSystem.GunType.Sniper:
+                return Globals.hasSniper;
+            default:
+                return false;
+        }
     }
 }

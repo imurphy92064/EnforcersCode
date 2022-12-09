@@ -10,7 +10,7 @@ public class EnemyHPDamage : MonoBehaviour
     private GameObject explosion;
     private Text HealthBarText;
     private Image HealthBar;
-    private float health;
+    public float health;
     private bool handldedEnemyDeath = false;
     public EnemyController enemyController;
     public ScoreText toScore;

@@ -8,7 +8,7 @@ public class FastEnemyAR : MonoBehaviour
 
     void Start()
     {
-        parent = transform.parent.GetComponent<FastEnemy>();
+        parent = transform.parent.parent.GetComponent<FastEnemy>();//Small Changed, need to go up 1 parent in the tree
     }
 
     private void OnTriggerEnter(Collider other)

@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class EnemyNormalSoldier : MonoBehaviour
+public class EnemyMechSoldier : MonoBehaviour
 {
     public float playerVisionRange;
     public Transform PlayerHead;
     private LayerMask WhatEnemyBulletsCanHit;
     private int LayerPlayer;
     public Transform Eyesight;
-    public GunSystem heldGun;
+    public GunSystem heldGun1;
+    public GunSystem heldGun2;
     private EnemyHP enemyHP;
     
     
@@ -29,17 +29,11 @@ public class EnemyNormalSoldier : MonoBehaviour
                 case "Eyesight":
                     Eyesight = currTransform;
                     break;
-                case "WEAPON_AR":
-                    heldGun = currTransform.GetComponent<GunSystem>();
-                    break;
-                case "WEAPON_SHOTGUN":
-                    heldGun = currTransform.GetComponent<GunSystem>();
-                    break;
                 case "ScifiMech20cmCanonBarrelLeft":
-                    heldGun = currTransform.GetComponent<GunSystem>();
+                    heldGun1 = currTransform.GetComponent<GunSystem>();
                     break;
                 case "ScifiMech20cmCanonBarrelRight":
-                    heldGun = currTransform.GetComponent<GunSystem>();
+                    heldGun2 = currTransform.GetComponent<GunSystem>();
                     break;
             }
         }
@@ -76,7 +70,8 @@ public class EnemyNormalSoldier : MonoBehaviour
         //Shoot if we can see player
         if (canSeePlayer&&!isDead)
         {
-            heldGun.TryShoot();
+            heldGun1.TryShoot();
+            heldGun2.TryShoot();
         }
 
         /*

@@ -8,7 +8,7 @@ public class LungeEnemyLR : MonoBehaviour
 
     void Start()
     {
-        parent = transform.parent.GetComponent<LungeEnemy>();
+        parent = transform.parent.parent.GetComponent<LungeEnemy>();//Small Changed, need to go up 1 parent in the tree
     }
 
     private void OnTriggerEnter(Collider other)

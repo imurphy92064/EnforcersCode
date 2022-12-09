@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LungeEnemyAR : MonoBehaviour
+public class MechEnemyAR : MonoBehaviour
 {
-    private LungeEnemy _parent = null;
+    private MechEnemy parent = null;
 
     void Start()
     {
-        _parent = transform.parent.parent.GetComponent<LungeEnemy>();//Small Changed, need to go up 1 parent in the tree
+        parent = transform.parent.parent.GetComponent<MechEnemy>();//Small Changed, need to go up 1 parent in the tree
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            _parent.isInAggroRadius = true;
+            parent.isInAggroRadius = true;
         }
     }
 
@@ -23,7 +23,7 @@ public class LungeEnemyAR : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            _parent.isInAggroRadius = false;
+            parent.isInAggroRadius = false;
         }
     }
 }

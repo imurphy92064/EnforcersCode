@@ -11,8 +11,12 @@ public class EnemyHP : MonoBehaviour
     private Image HealthBar;
     private Transform EnemyCanvas;
     private Transform CanvasPos;
+    public Animator animator;
 
+    public UnityEngine.AI.NavMeshAgent agent;
+    
     private GameObject BloodSprayEffect;
+    public GameObject[] explosions;
 
     //Vars
     public int MaxHealth;
@@ -26,11 +30,13 @@ public class EnemyHP : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         health = MaxHealth;
         shield = MaxShield;
         //enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         toScore= GameObject.Find("Score").GetComponent<ScoreText>();
-
+        explosions = new GameObject[3];
+        animator = GetComponentInChildren<Animator>();
         
         Transform[] transforms = GetComponentsInChildren<Transform>();
         foreach (Transform currTransform in transforms)
@@ -52,10 +58,26 @@ public class EnemyHP : MonoBehaviour
                 case "BloodSprayEffect":
                     BloodSprayEffect = currTransform.gameObject;
                     break;
+                case "Explosions":
+                    for (int i = 0; i < currTransform.gameObject.transform.childCount; i++)
+                    {
+                        Transform tempTransform;
+                        tempTransform = currTransform.gameObject.transform.GetChild(i);
+                        explosions[i] = tempTransform.gameObject;
+                    }
+                    break;
             }
         }
 
-        BloodSprayEffect.SetActive(false);
+        if (transform.gameObject.name == "MediumMechStriker") {
+            explosions[0].SetActive(false);
+            explosions[1].SetActive(false);
+            explosions[2].SetActive(false);
+            BloodSprayEffect.SetActive(false); 
+        }
+        else {
+            BloodSprayEffect.SetActive(false);    
+        }
     }
 
     private void Update()
@@ -69,6 +91,15 @@ public class EnemyHP : MonoBehaviour
 
     public void takeDamage(int damage)
     {
+        if (transform.parent != null)
+        {
+            if (transform.parent.name == "LungeEnemies")
+            {
+                //GetComponentInChildren<GunSystem>().readyToShoot = false;
+            }    
+        }
+        
+        
         int damageThatCanBeAppliedToShield = shield < damage ? shield : damage;
         int damageToApplyToHealth = damage - damageThatCanBeAppliedToShield;
         shield -= damageThatCanBeAppliedToShield;
@@ -77,11 +108,23 @@ public class EnemyHP : MonoBehaviour
 
         if (health <= 0 && !didHandleDeath)
         {
+            agent.isStopped = true;
+            animator.Play("Death");
             didHandleDeath = true;
             //enemyController.RemoveEnemy();
             toScore.addScore();
-            BloodSprayEffect.SetActive(true);
-            Destroy(gameObject, 1.5f);
+            if (transform.gameObject.name == "MediumMechStriker") {
+                explosions[0].SetActive(true);
+                explosions[1].SetActive(true);
+                explosions[2].SetActive(true);
+            }
+            else 
+            {
+                BloodSprayEffect.SetActive(true);    
+            }
+            
+            
+            Destroy(gameObject, 3.5f);
         }
     }
 }
