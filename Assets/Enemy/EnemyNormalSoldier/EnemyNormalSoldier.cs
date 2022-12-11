@@ -9,8 +9,8 @@ public class EnemyNormalSoldier : MonoBehaviour
     public Transform PlayerHead;
     private LayerMask WhatEnemyBulletsCanHit;
     private int LayerPlayer;
-    public Transform Eyesight;
-    public GunSystem heldGun;
+    private Transform Eyesight;
+    private GunSystem heldGun;
     private EnemyHP enemyHP;
     
     

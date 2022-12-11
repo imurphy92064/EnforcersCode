@@ -16,6 +16,7 @@ public class EnemyHP : MonoBehaviour
     public UnityEngine.AI.NavMeshAgent agent;
     
     private GameObject BloodSprayEffect;
+    private GameObject ShieldBreakEffect;
     public GameObject[] explosions;
 
     //Vars
@@ -24,6 +25,7 @@ public class EnemyHP : MonoBehaviour
     public int health;
     public int shield;
     public bool didHandleDeath = false;
+    public AudioClip ShieldBreakSFX;
     //public EnemyController enemyController;
     public ScoreText toScore;
     private bool isMech = false;
@@ -68,6 +70,9 @@ public class EnemyHP : MonoBehaviour
                         explosions[i] = tempTransform.gameObject;
                     }
                     break;
+                case "ShieldBreakEffect":
+                    ShieldBreakEffect = currTransform.gameObject;
+                    break;
             }
         }
 
@@ -78,7 +83,8 @@ public class EnemyHP : MonoBehaviour
                 explosion.SetActive(false);
             }
         }
-        BloodSprayEffect.SetActive(false); 
+        BloodSprayEffect.SetActive(false);
+        ShieldBreakEffect.SetActive(false);
     }
 
     private void Update()
@@ -92,20 +98,24 @@ public class EnemyHP : MonoBehaviour
 
     public void takeDamage(int damage)
     {
-        if (transform.parent != null)
-        {
-            if (transform.parent.name == "LungeEnemies")
-            {
-                //GetComponentInChildren<GunSystem>().readyToShoot = false;
-            }    
-        }
-        
-        
+        //Before
+        int beforeShield = shield;
+        //int beforeHealth = health;
+
+        //Damage and clamp
         int damageThatCanBeAppliedToShield = shield < damage ? shield : damage;
         int damageToApplyToHealth = damage - damageThatCanBeAppliedToShield;
         shield -= damageThatCanBeAppliedToShield;
         health -= damageToApplyToHealth;
         health = health < 0 ? 0 : health;
+
+        //Check if we cracked shield
+        if (beforeShield > 0 && shield == 0)
+        {
+            ShieldBreakEffect.SetActive(true);
+            StartCoroutine(hideShieldBreakEffect(0.5f));
+            AudioPool.playSound(ShieldBreakSFX, transform);
+        }
 
         if (health <= 0 && !didHandleDeath)
         {
@@ -127,5 +137,11 @@ public class EnemyHP : MonoBehaviour
             
             Destroy(gameObject, 3.5f);
         }
+    }
+
+    IEnumerator hideShieldBreakEffect(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        ShieldBreakEffect.SetActive(false);
     }
 }
