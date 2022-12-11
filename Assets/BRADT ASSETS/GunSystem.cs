@@ -9,6 +9,7 @@ public class GunSystem : MonoBehaviour
 {
     //Gun stats
     public GunType gunType;
+    public TrailType trailType;
     public int damage;
     public bool canZoom;
     public float timeBetweenShooting;
@@ -24,6 +25,7 @@ public class GunSystem : MonoBehaviour
     public int bulletsReserve;
     private bool readyToShoot = true;
     private bool reloading = false;
+    private uint shotsFired = 0;
 
     private const float TracerSpeed = 300f;
 
@@ -39,6 +41,7 @@ public class GunSystem : MonoBehaviour
     public GameObject muzzleFlash;
     public GameObject bulletHoleGraphic;
     public TrailRenderer BulletTrail;
+    public TrailRenderer PlasmaTrail;
     public TextMeshProUGUI text;
 
     //Recoil
@@ -74,8 +77,8 @@ public class GunSystem : MonoBehaviour
         if (readyToShoot && !reloading && bulletsMag > 0)
         {
             bulletsShotInThisBurst = bulletsPerTap;
-            
-            AudioPool.playSound(shootSound,transform);
+
+            AudioPool.playSound(shootSound, transform);
 
             //Fire
             Shoot();
@@ -88,7 +91,7 @@ public class GunSystem : MonoBehaviour
 
     public void TryReload()
     {
-        if (bulletsMag < magazineSize && !reloading && bulletsReserve>0)
+        if (bulletsMag < magazineSize && !reloading && bulletsReserve > 0)
         {
             Reload();
         }
@@ -104,63 +107,16 @@ public class GunSystem : MonoBehaviour
 
         // Calculate Direction with Spread
         Vector3 direction = BulletDirectionTransform.forward + new Vector3(x, y, 0);
-        //Vector3 forward = transform.TransformDirection(Vector3.forward) * 20;
-        TrailRenderer trail = Instantiate(BulletTrail, attackPoint.position, Quaternion.identity);
 
-        //RayCast
-        RaycastHit raycastHit;
-        Vector3 endpoint = Vector3.left;
         if (IsPlayerGun)
         {
             //Player Gun
-            if (Physics.Raycast(BulletDirectionTransform.position, direction, out raycastHit, range, WhatPlayerBulletsCanHit))
-            {
-                endpoint = raycastHit.point;
-
-                Transform currTransform = raycastHit.collider.transform;
-                if (currTransform.gameObject.layer == LayerEnemy)
-                {
-                    EscalateAndDamage(currTransform, false);
-                }
-
-                // Graphics
-                //GameObject t_newHole = Instantiate(bulletHoleGraphic, raycastHit.point + raycastHit.normal * 0.001f, Quaternion.identity) as GameObject;
-                //t_newHole.transform.LookAt(raycastHit.point + raycastHit.normal);
-                //Destroy(t_newHole, 5f);
-                GameObject t_newMuzzle = Instantiate(muzzleFlash, attackPoint.position, Quaternion.identity) as GameObject;
-                Destroy(t_newMuzzle, 0.5f);
-            }
-            else
-            {
-                endpoint = BulletDirectionTransform.position + BulletDirectionTransform.forward * 100.0f;
-            }
-            StartCoroutine(SpawnTrail(trail, endpoint));
+            PlayerGunHitcheck(direction);
         }
         else
         {
             //Enemy Gun
-            if (Physics.Raycast(BulletDirectionTransform.position, direction, out raycastHit, range, WhatEnemyBulletsCanHit))
-            {
-                endpoint = raycastHit.point;
-
-                Transform currTransform = raycastHit.collider.transform;
-                if (currTransform.gameObject.layer == LayerPlayer)
-                {
-                    EscalateAndDamage(currTransform, true);
-                }
-
-                // Graphics
-                //GameObject t_newHole = Instantiate(bulletHoleGraphic, raycastHit.point + raycastHit.normal * 0.001f, Quaternion.identity) as GameObject;
-                //t_newHole.transform.LookAt(raycastHit.point + raycastHit.normal);
-                //Destroy(t_newHole, 5f);
-                GameObject t_newMuzzle = Instantiate(muzzleFlash, attackPoint.position, Quaternion.identity) as GameObject;
-                Destroy(t_newMuzzle, 0.5f);
-            }
-            else
-            {
-                endpoint = BulletDirectionTransform.position + BulletDirectionTransform.forward * 100.0f;
-            }
-            StartCoroutine(SpawnTrail(trail, endpoint));
+            EnemyGunHitcheck(direction);
         }
 
         //Bullet dec
@@ -173,6 +129,64 @@ public class GunSystem : MonoBehaviour
         {
             Invoke("Shoot", timeBetweenShots);
         }
+    }
+
+    private void PlayerGunHitcheck(Vector3 pDirection)
+    {
+        RaycastHit raycastHit;
+        Vector3 endpoint = Vector3.zero;
+
+        if (Physics.Raycast(BulletDirectionTransform.position, pDirection, out raycastHit, range, WhatPlayerBulletsCanHit))
+        {
+            endpoint = raycastHit.point;
+
+            Transform currTransform = raycastHit.collider.transform;
+            if (currTransform.gameObject.layer == LayerEnemy)
+            {
+                EscalateAndDamage(currTransform, false);
+            }
+
+            GameObject t_newMuzzle = Instantiate(muzzleFlash, attackPoint.position, Quaternion.identity) as GameObject;
+            Destroy(t_newMuzzle, 0.5f);
+        }
+        else
+        {
+            endpoint = BulletDirectionTransform.position + BulletDirectionTransform.forward * 100.0f;
+        }
+        
+        StartCoroutine(SpawnTrail(getTrail(), endpoint));
+        shotsFired++;
+    }
+
+    private void EnemyGunHitcheck(Vector3 pDirection)
+    {
+        RaycastHit raycastHit;
+        Vector3 endpoint = Vector3.zero;
+
+        if (Physics.Raycast(BulletDirectionTransform.position, pDirection, out raycastHit, range, WhatEnemyBulletsCanHit))
+        {
+            endpoint = raycastHit.point;
+
+            Transform currTransform = raycastHit.collider.transform;
+            if (currTransform.gameObject.layer == LayerPlayer)
+            {
+                EscalateAndDamage(currTransform, true);
+            }
+
+            GameObject t_newMuzzle = Instantiate(muzzleFlash, attackPoint.position, Quaternion.identity) as GameObject;
+            Destroy(t_newMuzzle, 0.5f);
+        }
+        else
+        {
+            endpoint = BulletDirectionTransform.position + BulletDirectionTransform.forward * 100.0f;
+        }
+
+        //Only spawn the bullet sometimes
+        if (shotsFired % 2 == 0)
+        {
+            StartCoroutine(SpawnTrail(getTrail(), endpoint));
+        }
+        shotsFired++;
     }
 
     private void EscalateAndDamage(Transform pTransform, bool isPlayerTransform)
@@ -242,7 +256,20 @@ public class GunSystem : MonoBehaviour
             yield return null;
         }
         Trail.transform.position = HitPoint;
-        Destroy(Trail.gameObject, Trail.time*10f);
+        Destroy(Trail.gameObject, Trail.time * 10f);
+    }
+
+    private TrailRenderer getTrail()
+    {
+        switch (trailType)
+        {
+            case TrailType.Bullet:
+                return Instantiate(BulletTrail, attackPoint.position, Quaternion.identity);
+            case TrailType.Plasma:
+                return Instantiate(PlasmaTrail, attackPoint.position, Quaternion.identity);
+            default:
+                return Instantiate(BulletTrail, attackPoint.position, Quaternion.identity);
+        }
     }
 
     private void ResetShot()
@@ -252,7 +279,7 @@ public class GunSystem : MonoBehaviour
 
     private void Reload()
     {
-        AudioPool.playSound(reloadSound,transform);
+        AudioPool.playSound(reloadSound, transform);
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
     }
@@ -274,5 +301,11 @@ public class GunSystem : MonoBehaviour
         AssultRifle,
         Shotgun,
         Sniper
+    }
+
+    public enum TrailType
+    {
+        Bullet,
+        Plasma,
     }
 }
