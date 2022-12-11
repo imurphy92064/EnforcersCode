@@ -26,6 +26,7 @@ public class EnemyHP : MonoBehaviour
     public bool didHandleDeath = false;
     //public EnemyController enemyController;
     public ScoreText toScore;
+    private bool isMech = false;
 
     // Use this for initialization
     private void Start()
@@ -59,6 +60,7 @@ public class EnemyHP : MonoBehaviour
                     BloodSprayEffect = currTransform.gameObject;
                     break;
                 case "Explosions":
+                    isMech = true;
                     for (int i = 0; i < currTransform.gameObject.transform.childCount; i++)
                     {
                         Transform tempTransform;
@@ -69,15 +71,14 @@ public class EnemyHP : MonoBehaviour
             }
         }
 
-        if (transform.gameObject.name == "MediumMechStriker") {
-            explosions[0].SetActive(false);
-            explosions[1].SetActive(false);
-            explosions[2].SetActive(false);
-            BloodSprayEffect.SetActive(false); 
+        if (isMech)
+        {
+            foreach (GameObject explosion in explosions)
+            {
+                explosion.SetActive(false);
+            }
         }
-        else {
-            BloodSprayEffect.SetActive(false);    
-        }
+        BloodSprayEffect.SetActive(false); 
     }
 
     private void Update()

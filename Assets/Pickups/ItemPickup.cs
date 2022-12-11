@@ -76,6 +76,11 @@ public class ItemPickup : MonoBehaviour
 
     private void Update()
     {
+        if (hasBeenClaimed)
+        {
+            return;
+        }
+
         //Move point
         currTime += Time.deltaTime;
         while (currTime > SecondsPerUpDown)
@@ -164,7 +169,7 @@ public class ItemPickup : MonoBehaviour
 
             //Destroy
             Destroy(PrefabInstance);
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
     }
 
