@@ -33,7 +33,7 @@ public class FastEnemy : MonoBehaviour
     public bool wasKeyCollected = false;
     private FastEnemyMovement movementStatus = FastEnemyMovement.Idle;
 
-    
+
     //Animations
     private const string ENEMY_IDLE = "BasicMotions@Idle01";
     private const string ENEMY_WALK = "BasicMotions@Walk01 - Forwards";
@@ -57,18 +57,24 @@ public class FastEnemy : MonoBehaviour
      * 12/8/22 Changes:
      *  1. Changed the way animations are executed like Lunge Enemy. 
      */
-    
+
     // Use this for initialization
     void Start()
     {
-        
+
         timePerPatrolTargetChange = Random.Range(4f, 7f);
         enemyNormalSoldierLOS = GetComponent<EnemyNormalSoldier>();
         animator = GetComponentInChildren<Animator>();
         animatorHashes = animator.parameters;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-        enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
+
+        GameObject potEnemyController = GameObject.Find("EnemyController");
+        if (potEnemyController != null)
+        {
+            enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
+        }
+
         currentTarget = transform.position;
         agent.speed = patrollingSpeed;
         isInAggroRadius = false;
@@ -133,7 +139,7 @@ public class FastEnemy : MonoBehaviour
                 return;
             }
         }
-        
+
         enemyNormalSoldierLOS.enabled = false;
         //Switch if we have to
         if (isInAggroRadius)
@@ -145,7 +151,7 @@ public class FastEnemy : MonoBehaviour
             changeMode(FastEnemyModes.AggroWalk);
             return;
         }
-        
+
         if (wasKeyCollected)
         {
             tryToPlay(ENEMY_WALK_TO_SPRINT);
@@ -154,7 +160,7 @@ public class FastEnemy : MonoBehaviour
             changeMode(FastEnemyModes.Manic);
             return;
         }
-        
+
         //Update speed
         agent.speed = patrollingSpeed;
 
@@ -242,7 +248,7 @@ public class FastEnemy : MonoBehaviour
         //Update
         currentMode = newMode;
     }
-    
+
     private void tryToPlay(string animation)
     {
         switch (animation)
@@ -255,7 +261,7 @@ public class FastEnemy : MonoBehaviour
                 }
                 break;
             case ENEMY_WALK:
-            case ENEMY_IDLE_TO_WALK:    
+            case ENEMY_IDLE_TO_WALK:
                 if (movementStatus != FastEnemyMovement.Walking)
                 {
                     animator.Play(animation);
@@ -263,7 +269,7 @@ public class FastEnemy : MonoBehaviour
                 }
                 break;
             case ENEMY_RUN:
-            case ENEMY_WALK_TO_RUN:    
+            case ENEMY_WALK_TO_RUN:
                 if (movementStatus != FastEnemyMovement.Running)
                 {
                     animator.Play(animation);
@@ -272,18 +278,19 @@ public class FastEnemy : MonoBehaviour
                 break;
             case ENEMY_SPRINT:
             case ENEMY_IDLE_TO_SPRINT:
-            case ENEMY_WALK_TO_SPRINT:    
+            case ENEMY_WALK_TO_SPRINT:
                 if (movementStatus != FastEnemyMovement.Sprinting)
                 {
                     animator.Play(animation);
                     movementStatus = FastEnemyMovement.Sprinting;
                 }
                 break;
-                
+
         }
     }
-    
-    public void changeMovementStatus(FastEnemyMovement newStatus) {
+
+    public void changeMovementStatus(FastEnemyMovement newStatus)
+    {
         switch (newStatus)
         {
             case FastEnemyMovement.Idle:
@@ -291,7 +298,7 @@ public class FastEnemy : MonoBehaviour
                 break;
             case FastEnemyMovement.Walking:
                 movementStatus = newStatus;
-                break;            
+                break;
             case FastEnemyMovement.Running:
                 movementStatus = newStatus;
                 break;
