@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     private const float ConstDashDistance = 8f;
     private const int ConstMaxJumps = 2;
     private int jumpCount = ConstMaxJumps;
-    private bool isTouchingGroundLastFrame = false;
+    //private bool isTouchingGroundLastFrame = false;
     private bool isTouchingGroundThisFrame = false;
     private bool isShooting = false;
     private EnforcersControls controls;
@@ -197,12 +197,12 @@ public class Player : MonoBehaviour
         Globals.PlayerDash = Globals.PlayerDash > 1f ? 1f : Globals.PlayerDash;
 
         //Jump
-        isTouchingGroundThisFrame = Physics.CheckSphere(Feet.position, 0.5f, GroundLayer, QueryTriggerInteraction.Ignore);
-        if (isTouchingGroundThisFrame&&!isTouchingGroundLastFrame)
+        isTouchingGroundThisFrame = Physics.CheckSphere(Feet.position, 0.55f, GroundLayer, QueryTriggerInteraction.Ignore);
+        if (isTouchingGroundThisFrame)
         {
             jumpCount = ConstMaxJumps;
         }
-        isTouchingGroundLastFrame = isTouchingGroundThisFrame;
+        //isTouchingGroundLastFrame = isTouchingGroundThisFrame;
 
         //Fire
         if (isShooting)
