@@ -9,7 +9,6 @@ public class GunSystem : MonoBehaviour
 {
     //Gun stats
     public GunType gunType;
-    public TrailType trailType;
     public int damage;
     public bool canZoom;
     public float timeBetweenShooting;
@@ -38,10 +37,9 @@ public class GunSystem : MonoBehaviour
     private int LayerEnemy;
 
     //Graphics
+    public TrailRenderer tracer;
     public GameObject muzzleFlash;
     public GameObject bulletHoleGraphic;
-    public TrailRenderer BulletTrail;
-    public TrailRenderer PlasmaTrail;
     public TextMeshProUGUI text;
 
     //Recoil
@@ -78,7 +76,7 @@ public class GunSystem : MonoBehaviour
         {
             bulletsShotInThisBurst = bulletsPerTap;
 
-            AudioPool.playSound(shootSound, transform);
+            AudioPool.playSound(shootSound, transform, IsPlayerGun ? 1f : 0.3f);
 
             //Fire
             Shoot();
@@ -154,7 +152,7 @@ public class GunSystem : MonoBehaviour
             endpoint = BulletDirectionTransform.position + BulletDirectionTransform.forward * 100.0f;
         }
         
-        StartCoroutine(SpawnTrail(getTrail(), endpoint));
+        StartCoroutine(SpawnTrail(Instantiate(tracer, attackPoint.position, Quaternion.identity), endpoint));
         shotsFired++;
     }
 
@@ -184,7 +182,7 @@ public class GunSystem : MonoBehaviour
         //Only spawn the bullet sometimes
         if (shotsFired % 2 == 0)
         {
-            StartCoroutine(SpawnTrail(getTrail(), endpoint));
+            StartCoroutine(SpawnTrail(Instantiate(tracer, attackPoint.position, Quaternion.identity), endpoint));
         }
         shotsFired++;
     }
@@ -259,7 +257,7 @@ public class GunSystem : MonoBehaviour
         Destroy(Trail.gameObject, Trail.time * 10f);
     }
 
-    private TrailRenderer getTrail()
+    /*private TrailRenderer getTrail()
     {
         switch (trailType)
         {
@@ -270,7 +268,7 @@ public class GunSystem : MonoBehaviour
             default:
                 return Instantiate(BulletTrail, attackPoint.position, Quaternion.identity);
         }
-    }
+    }*/
 
     private void ResetShot()
     {
@@ -279,7 +277,7 @@ public class GunSystem : MonoBehaviour
 
     private void Reload()
     {
-        AudioPool.playSound(reloadSound, transform);
+        AudioPool.playSound(reloadSound, transform, IsPlayerGun ? 1f : 0.3f);
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
     }

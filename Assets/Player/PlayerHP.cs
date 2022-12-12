@@ -9,15 +9,16 @@ public class PlayerHP : MonoBehaviour
     //Vars
     public int MaxHealth;
     public int MaxShield;
-    public int health;
-    public int shield;
     public bool didHandleDeath = false;
 
     //Player Kill
     private ReStart restart;
     private TextMeshProUGUI end;
 
-    // Use this for initialization
+    [Header("Ignore these")]
+    public int health;
+    public int shield;
+
     private void Start()
     {
         health = MaxHealth;

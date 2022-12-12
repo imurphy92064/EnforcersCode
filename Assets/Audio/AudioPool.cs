@@ -29,7 +29,7 @@ public class AudioPool : MonoBehaviour
         }
     }
 
-    public static void playSound(AudioClip audioClip, Transform pTransformToStickTo)
+    public static void playSound(AudioClip audioClip, Transform pTransformToStickTo, float volumeScale)
     {
         //Bail for null pointers
         if (Singleton == null || Singleton.Speakers[currIndex] == null)
@@ -38,7 +38,7 @@ public class AudioPool : MonoBehaviour
         }
 
         //Play
-        Singleton.Speakers[currIndex].playSound(audioClip, pTransformToStickTo);
+        Singleton.Speakers[currIndex].playSound(audioClip, pTransformToStickTo, volumeScale);
 
         //Inc
         currIndex++;

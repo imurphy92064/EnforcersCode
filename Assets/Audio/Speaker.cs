@@ -24,7 +24,7 @@ public class Speaker : MonoBehaviour
         transform.rotation = TransformToStickTo.rotation;
     }
 
-    public void playSound(AudioClip audioClip, Transform pTransformToStickTo)
+    public void playSound(AudioClip audioClip, Transform pTransformToStickTo, float volumeScale)
     {
         //Stop
         audioSource.Stop();
@@ -35,6 +35,6 @@ public class Speaker : MonoBehaviour
         transform.rotation = TransformToStickTo.rotation;
 
         //Play
-        audioSource.PlayOneShot(audioClip);
+        audioSource.PlayOneShot(audioClip, volumeScale);
     }
 }

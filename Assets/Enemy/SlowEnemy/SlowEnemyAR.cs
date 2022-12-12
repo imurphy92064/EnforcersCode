@@ -1,29 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SlowEnemyAR : MonoBehaviour
-{
-    private SlowEnemy parent = null;
+public class SlowEnemyAR : MonoBehaviour {
+	private SlowEnemy parent;
 
-    void Start()
-    {
-        parent = transform.parent.GetComponent<SlowEnemy>();
-    }
+	private void Start() {
+		parent = transform.parent.GetComponent<SlowEnemy>();
+	}
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            parent.isInAggroRadius = true;
-        }
-    }
+	private void OnTriggerEnter(Collider other) {
+		if (other.CompareTag("Player")) parent.isInAggroRadius = true;
+	}
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            parent.isInAggroRadius = false;
-        }
-    }
+	private void OnTriggerExit(Collider other) {
+		if (other.CompareTag("Player")) parent.isInAggroRadius = false;
+	}
 }

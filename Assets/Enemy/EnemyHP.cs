@@ -1,48 +1,56 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
-using TMPro;
 
 public class EnemyHP : MonoBehaviour
 {
-    //References
-    private Text HealthBarText;
-    private Image HealthBar;
-    private Transform EnemyCanvas;
-    private Transform CanvasPos;
-    public Animator animator;
-
-    public UnityEngine.AI.NavMeshAgent agent;
-    
-    private GameObject BloodSprayEffect;
-    private GameObject ShieldBreakEffect;
-    public GameObject[] explosions;
-
-    //Vars
     public int MaxHealth;
     public int MaxShield;
-    public int health;
-    public int shield;
-    public bool didHandleDeath = false;
     public AudioClip ShieldBreakSFX;
     //public EnemyController enemyController;
-    public ScoreText toScore;
-    private bool isMech = false;
 
-    // Use this for initialization
+    private bool didHandleDeath;
+    private GameObject ShieldBreakEffect;
+    private GameObject BloodSprayEffect;
+    private GameObject[] explosions = new GameObject[3];
+    private Transform CanvasPos;
+    private Transform EnemyCanvas;
+    private FastEnemy FastEnemyObj;
+    private LungeEnemy LungeEnemyObj;
+    private MechEnemy MechEnemyObj;
+    private BossEnemy FinalBossEnemyObj;
+    private Image HealthBar;
+    private Text HealthBarText;
+    private EnemyType enemyType;
+    private Animator animator;
+    private NavMeshAgent agent;
+    private ScoreText toScore;
+
+    [Header("Ignore these")]
+    public int health;
+    public int shield;
+
     private void Start()
     {
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        //Set HP
         health = MaxHealth;
         shield = MaxShield;
-        //enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
-        toScore= GameObject.Find("Score").GetComponent<ScoreText>();
-        explosions = new GameObject[3];
+
+        //Grab Agent
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null)
+        {
+            agent = GetComponentInChildren<NavMeshAgent>();
+        }
+
+        //Grab some other crap
+        toScore = GameObject.Find("Score").GetComponent<ScoreText>();
         animator = GetComponentInChildren<Animator>();
-        
-        Transform[] transforms = GetComponentsInChildren<Transform>();
-        foreach (Transform currTransform in transforms)
+
+        var transforms = GetComponentsInChildren<Transform>();
+        foreach (var currTransform in transforms)
         {
             switch (currTransform.name)
             {
@@ -61,37 +69,56 @@ public class EnemyHP : MonoBehaviour
                 case "BloodSprayEffect":
                     BloodSprayEffect = currTransform.gameObject;
                     break;
+                case "ShieldBreakEffect":
+                    ShieldBreakEffect = currTransform.gameObject;
+                    break;
                 case "Explosions":
-                    isMech = true;
-                    for (int i = 0; i < currTransform.gameObject.transform.childCount; i++)
+                    for (var i = 0; i < currTransform.gameObject.transform.childCount; i++)
                     {
                         Transform tempTransform;
                         tempTransform = currTransform.gameObject.transform.GetChild(i);
                         explosions[i] = tempTransform.gameObject;
                     }
                     break;
-                case "ShieldBreakEffect":
-                    ShieldBreakEffect = currTransform.gameObject;
-                    break;
             }
         }
 
-        if (isMech)
+        //Disable effects
+        if (BloodSprayEffect != null) BloodSprayEffect.SetActive(false);
+        if (ShieldBreakEffect != null) ShieldBreakEffect.SetActive(false);
+        if (explosions[0] != null) explosions[0].SetActive(false);
+        if (explosions[1] != null) explosions[1].SetActive(false);
+        if (explosions[2] != null) explosions[2].SetActive(false);
+
+        //Get enemy scripts
+        if (transform.name.Contains("Fast"))
         {
-            foreach (GameObject explosion in explosions)
-            {
-                explosion.SetActive(false);
-            }
+            enemyType = EnemyType.Fast;
+            FastEnemyObj = GetComponent<FastEnemy>();
         }
-        BloodSprayEffect.SetActive(false);
-        ShieldBreakEffect.SetActive(false);
+        if (transform.name.Contains("Lunge"))
+        {
+            enemyType = EnemyType.Lunge;
+            LungeEnemyObj = GetComponent<LungeEnemy>();
+
+        }
+        if (transform.name.Contains("Mech"))
+        {
+            enemyType = EnemyType.Mech;
+            MechEnemyObj = GetComponent<MechEnemy>();
+        }
+        if (transform.name.Contains("FinalBoss"))
+        {
+            enemyType = EnemyType.FinalBoss;
+            FinalBossEnemyObj = GetComponent<BossEnemy>();
+        }
     }
 
     private void Update()
     {
         //Update health
         HealthBarText.text = health.ToString();
-        HealthBar.fillAmount = (float)health / (float)MaxHealth;
+        HealthBar.fillAmount = health / (float)MaxHealth;
         EnemyCanvas.transform.position = CanvasPos.transform.position;
         EnemyCanvas.transform.rotation = CanvasPos.transform.rotation;
     }
@@ -100,7 +127,6 @@ public class EnemyHP : MonoBehaviour
     {
         //Before
         int beforeShield = shield;
-        //int beforeHealth = health;
 
         //Damage and clamp
         int damageThatCanBeAppliedToShield = shield < damage ? shield : damage;
@@ -110,38 +136,62 @@ public class EnemyHP : MonoBehaviour
         health = health < 0 ? 0 : health;
 
         //Check if we cracked shield
-        if (beforeShield > 0 && shield == 0)
+        if (beforeShield > 0 && shield == 0 && ShieldBreakEffect != null)
         {
             ShieldBreakEffect.SetActive(true);
-            StartCoroutine(hideShieldBreakEffect(0.5f));
-            AudioPool.playSound(ShieldBreakSFX, transform);
+            StartCoroutine(disableInXSeconds(ShieldBreakEffect, 0.5f));
+            AudioPool.playSound(ShieldBreakSFX, transform, 0.5f);
         }
 
         if (health <= 0 && !didHandleDeath)
         {
             agent.isStopped = true;
-            animator.Play("Death");
+
+            switch (enemyType)
+            {
+                case EnemyType.Fast:
+                    BloodSprayEffect.SetActive(true);
+                    StartCoroutine(disableInXSeconds(BloodSprayEffect, 1.5f));
+                    FastEnemyObj.tryToPlay(FastEnemy.ENEMY_DEATH);
+                    break;
+                case EnemyType.Lunge:
+                    BloodSprayEffect.SetActive(true);
+                    StartCoroutine(disableInXSeconds(BloodSprayEffect, 1.5f));
+                    LungeEnemyObj.tryToPlay(LungeEnemy.ENEMY_DEATH);
+                    break;
+                case EnemyType.Mech:
+                    explosions[0].SetActive(true);
+                    StartCoroutine(disableInXSeconds(explosions[0], 4f));
+                    explosions[1].SetActive(true);
+                    StartCoroutine(disableInXSeconds(explosions[1], 4f));
+                    explosions[2].SetActive(true);
+                    StartCoroutine(disableInXSeconds(explosions[2], 4f));
+                    MechEnemyObj.tryToPlay(MechEnemy.ENEMY_DEATH);
+                    break;
+                case EnemyType.FinalBoss:
+                    FinalBossEnemyObj.tryToPlay(BossEnemy.ENEMY_DEATH);
+                    break;
+            }
             didHandleDeath = true;
+
             //enemyController.RemoveEnemy();
             toScore.addScore();
-            if (transform.gameObject.name == "MediumMechStriker") {
-                explosions[0].SetActive(true);
-                explosions[1].SetActive(true);
-                explosions[2].SetActive(true);
-            }
-            else 
-            {
-                BloodSprayEffect.SetActive(true);    
-            }
-            
-            
-            Destroy(gameObject, 3.5f);
+
+            Destroy(gameObject, 5f);
         }
     }
 
-    IEnumerator hideShieldBreakEffect(float waitTime)
+    IEnumerator disableInXSeconds(GameObject pGameObject, float pTime)
     {
-        yield return new WaitForSeconds(waitTime);
-        ShieldBreakEffect.SetActive(false);
+        yield return new WaitForSeconds(pTime);
+        pGameObject.SetActive(false);
     }
+}
+
+public enum EnemyType
+{
+    Lunge,
+    Fast,
+    Mech,
+    FinalBoss,
 }

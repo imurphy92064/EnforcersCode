@@ -1,35 +1,27 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
-public class EnemyController : MonoBehaviour
-{
-    [SerializeField]//this tag makes your private variable also viewable in the editor for easier debugging
-    public List<GameObject> Enemies = new List<GameObject>();
-    public TextMeshProUGUI enemyCounter;
+public class EnemyController : MonoBehaviour {
+	[SerializeField] //this tag makes your private variable also viewable in the editor for easier debugging
+	public List<GameObject> Enemies = new();
 
-    //Script just needs to keep track of enemies and display how many are left
+	public TextMeshProUGUI enemyCounter;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        enemyCounter.text = "Enemies In The Area: " + Enemies.Count.ToString();
-    }
+	//Script just needs to keep track of enemies and display how many are left
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Enemies.Count == 0)
-        {
-            enemyCounter.text = "Find Your Way To The End of The Level!";
-        }
-    }
+	// Start is called before the first frame update
+	private void Start() {
+		enemyCounter.text = "Enemies In The Area: " + Enemies.Count;
+	}
 
-    public void RemoveEnemy()
-    {
+	// Update is called once per frame
+	private void Update() {
+		if (Enemies.Count == 0) enemyCounter.text = "Find Your Way To The End of The Level!";
+	}
 
-        Enemies.RemoveAt(0);
-        enemyCounter.text = "Enemies Remaining: " + Enemies.Count.ToString();
-    }
+	public void RemoveEnemy() {
+		Enemies.RemoveAt(0);
+		enemyCounter.text = "Enemies Remaining: " + Enemies.Count;
+	}
 }

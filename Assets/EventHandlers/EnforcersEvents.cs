@@ -5,5 +5,5 @@ using UnityEngine.Events;
 
 public class EnforcersEvents : MonoBehaviour
 {
-    public static UnityEvent keyCollected = new UnityEvent();
+    //public static UnityEvent keyCollected = new UnityEvent();
 }

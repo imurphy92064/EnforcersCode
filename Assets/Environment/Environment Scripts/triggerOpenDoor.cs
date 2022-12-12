@@ -8,37 +8,37 @@ public class triggerOpenDoor : MonoBehaviour
     public TextMeshProUGUI endText;
     public GameObject key;
 
-    
+
     // Start is called before the first frame update
-    
-    
+
+
     void Start()
     {
         key.SetActive(false);
-        trigger= GameObject.Find("DoorTrigger2").GetComponent<DoorTriggerKey>();
+        trigger = GameObject.Find("DoorTrigger2").GetComponent<DoorTriggerKey>();
     }
 
-   
-   void OnTriggerEnter(Collider other)
-   {
-    if(other.tag == "Player")
+
+    void OnTriggerEnter(Collider other)
     {
-        EnforcersEvents.keyCollected.Invoke();
-        trigger.OpenDoor();
-        Destroy(this.gameObject);
-        endText.text="Key Switch Found! A Door Has Opened!";
+        if (other.tag == "Player")
+        {
+            //EnforcersEvents.keyCollected.Invoke();
+            trigger.OpenDoor();
+            Destroy(this.gameObject);
+            endText.text = "Key Switch Found! A Door Has Opened!";
+        }
+        void OnTriggerExit()
+        {
+            endText.text = " ";
+        }
+
     }
-    void OnTriggerExit()
+
+    public void show()
     {
-        endText.text=" ";
+        key.SetActive(true);
     }
-
-   }
-
-   public void show()
-   {
-    key.SetActive(true);
-   }
 
 
 
