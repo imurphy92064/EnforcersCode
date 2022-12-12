@@ -44,7 +44,7 @@ public class Chasing : MonoBehaviour {
 			health -= 10;
 
 			if (health < 1) {
-				enemyController.RemoveEnemy();
+				//enemyController.RemoveEnemy();
 				Destroy(this);
 				Instantiate(explostion, transform.position, transform.rotation);
 				Destroy(gameObject);

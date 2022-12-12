@@ -14,7 +14,7 @@ public class EnemyHPDamage : MonoBehaviour {
 	// Use this for initialization
 	private void Start() {
 		health = maxHealth;
-		enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
+		//enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
 		toScore = GameObject.Find("Score").GetComponent<ScoreText>();
 
 		var transforms = GetComponentsInChildren<Transform>();
@@ -41,7 +41,7 @@ public class EnemyHPDamage : MonoBehaviour {
 		health = health < 0f ? 0f : health;
 
 		if (health <= 0f && !handldedEnemyDeath) {
-			enemyController.RemoveEnemy();
+			//enemyController.RemoveEnemy();
 			toScore.addScore();
 			handldedEnemyDeath = true;
 

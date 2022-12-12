@@ -28,11 +28,6 @@ public class triggerOpenDoor : MonoBehaviour
             Destroy(this.gameObject);
             endText.text = "Key Switch Found! A Door Has Opened!";
         }
-        void OnTriggerExit()
-        {
-            endText.text = " ";
-        }
-
     }
 
     public void show()

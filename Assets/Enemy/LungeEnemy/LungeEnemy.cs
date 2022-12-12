@@ -135,7 +135,7 @@ public class LungeEnemy : MonoBehaviour
             if (health < 1.0f && !handldedEnemyDeath)
             {
                 handldedEnemyDeath = true;
-                enemyController.RemoveEnemy();
+                //enemyController.RemoveEnemy();
                 toScore.addScore();
             }
     }

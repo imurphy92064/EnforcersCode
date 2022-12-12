@@ -27,9 +27,4 @@ public class ReStart : MonoBehaviour
             Player.LockCursor();
         }
     }
-
-    public void restartGame(string name)
-    {
-        Application.LoadLevel(name);
-    }
 }

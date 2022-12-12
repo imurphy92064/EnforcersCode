@@ -4,35 +4,19 @@ using UnityEngine;
 using TMPro;
 public class Victory01 : MonoBehaviour
 {
-    public TextMeshProUGUI gameend;
-    private EnemyController enem;
-    // Start is called before the first frame update
-    void Start()
+    //public TextMeshProUGUI gameend;
+    //private EnemyController enem;
+    
+    /*void Start()
     {
-       enem= GameObject.Find("EnemyController").GetComponent<EnemyController>(); 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        enem = GameObject.Find("EnemyController").GetComponent<EnemyController>();
+    }*/
 
     void OnTriggerEnter(Collider other)
     {
-
-        if(enem.Enemies.Count != 0 && other.tag == "Player" )
+        if (other.tag == "Player")
         {
-            gameend.text= " You Must Defeat All Enemies First!";
+            SceneLoading.loadScene("Level2");
         }
-        else if(enem.Enemies.Count == 0 && other.tag == "Player")
-        {
-            Application.LoadLevel(3);
-        }
-
-
-
-
-
     }
 }

@@ -12,7 +12,7 @@ public class menutransition : MonoBehaviour
     {
         if(Input.GetKeyDown("space"))
         {
-            Application.LoadLevel(1);
+            SceneLoading.loadScene("Menu");
         }
     }
 }

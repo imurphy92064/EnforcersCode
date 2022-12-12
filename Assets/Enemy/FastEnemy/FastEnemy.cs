@@ -122,7 +122,7 @@ public class FastEnemy : MonoBehaviour {
 				//health -= 10.0f;
 			if (health < 1.0f && !handldedEnemyDeath) {
 				handldedEnemyDeath = true;
-				enemyController.RemoveEnemy();
+				//enemyController.RemoveEnemy();
 
 				//Destroy(this);
 				//Instantiate(explostion, transform.position, transform.rotation);

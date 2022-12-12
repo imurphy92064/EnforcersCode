@@ -44,8 +44,6 @@ public class BossEnemy : MonoBehaviour
 	private const string ENEMY_WALK_TO_RUN = "Walk-To-Run";
 	public const string ENEMY_DEATH = "Death";
 
-	private bool handldedEnemyDeath = false;
-	private float health = maxHealth;
 	private float timeElapsed;
 	private float timePerPatrolTargetChange;
 

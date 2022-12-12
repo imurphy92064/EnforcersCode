@@ -6,7 +6,7 @@ public class Menu2 : MonoBehaviour {
 
 	void OnGUI() {
 		if(GUI.Button(new Rect(0, 500, 100, 50), "Menu")) {
-			Application.LoadLevel(1);
+			SceneLoading.loadScene("Menu");
 		}
 	}
 }
