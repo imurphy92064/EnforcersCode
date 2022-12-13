@@ -11,7 +11,7 @@ public class ItemPickup : MonoBehaviour
     public GameObject PrefabBlueKey;
     public GameObject PrefabHealth;
     public GameObject PrefabArmor;
-    public GameObject PrefabAmmmo;
+    public GameObject PrefabAmmo;
     public GameObject PrefabPistol;
     public GameObject PrefabAssultRifle;
     public GameObject PrefabShotgun;
@@ -56,8 +56,8 @@ public class ItemPickup : MonoBehaviour
             case PickupType.Armor:
                 PrefabInstance = Instantiate(PrefabArmor);
                 break;
-            case PickupType.Ammmo:
-                PrefabInstance = Instantiate(PrefabAmmmo);
+            case PickupType.Ammo:
+                PrefabInstance = Instantiate(PrefabAmmo);
                 break;
             case PickupType.Pistol:
                 PrefabInstance = Instantiate(PrefabPistol);
@@ -147,7 +147,7 @@ public class ItemPickup : MonoBehaviour
                         }
                     }
                     break;
-                case PickupType.Ammmo:
+                case PickupType.Ammo:
                     GiveAmmo(other);
                     break;
                 case PickupType.Pistol:
@@ -207,7 +207,7 @@ public enum PickupType
     BlueKey,
     Health,
     Armor,
-    Ammmo,
+    Ammo,
     Pistol,
     AssultRifle,
     Shotgun,
