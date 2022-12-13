@@ -49,7 +49,6 @@ public class LungeEnemy : MonoBehaviour
     private AnimatorControllerParameter[] animatorHashes;
     private LungeEnemyModes currentMode = LungeEnemyModes.Patrol;
     private Vector3 currentTarget;
-    private EnemyController enemyController;
     private bool handldedEnemyDeath;
 
     private readonly float health = maxHealth;
@@ -89,10 +88,6 @@ public class LungeEnemy : MonoBehaviour
         animatorHashes = animator.parameters;
         agent = GetComponent<NavMeshAgent>();
         toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-        if (GameObject.Find("EnemyController") != null)
-        {
-            enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
-        }
         currentTarget = transform.position;
         agent.speed = patrollingSpeed;
         isInAggroRadius = false;

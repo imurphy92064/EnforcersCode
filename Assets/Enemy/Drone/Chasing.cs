@@ -9,8 +9,6 @@ public class Chasing : MonoBehaviour {
 	public GameObject explostion;
 	public ScoreText toScore;
 
-	public EnemyController enemyController;
-
 	public NavMeshAgent agent;
 	private Image healBar;
 
@@ -27,7 +25,6 @@ public class Chasing : MonoBehaviour {
 		healText = transform.Find("EnemyCanvas").Find("HealthBarText").GetComponent<Text>();
 		healBar = transform.Find("EnemyCanvas").Find("MaxHealthBar").Find("HealthBar").GetComponent<Image>();
 		toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-		enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
 	}
 
 	// Update is called once per frame

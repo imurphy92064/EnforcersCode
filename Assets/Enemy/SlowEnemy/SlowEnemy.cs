@@ -15,7 +15,6 @@ public class SlowEnemy : MonoBehaviour {
 
 	private SlowEnemyModes currentMode = SlowEnemyModes.Patrol;
 	private Vector3 currentTarget;
-	private EnemyController enemyController;
 	private float timeElapsed;
 
 	private ScoreText toScore;
@@ -24,7 +23,6 @@ public class SlowEnemy : MonoBehaviour {
 	private void Start() {
 		agent = GetComponent<NavMeshAgent>();
 		toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-		enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
 		currentTarget = transform.position;
 		agent.speed = patrollingSpeed;
 		isInAggroRadius = false;

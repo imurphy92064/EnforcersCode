@@ -20,7 +20,6 @@ public class BossEnemy : MonoBehaviour
 	private const float maxHealth = 80.0f;
 
 	public Transform PlayerTransform;
-	private EnemyController enemyController;
 	private EnemyBossSoldier EnemyBossSoldierLOS;
 	private ScoreText toScore;
 
@@ -56,7 +55,6 @@ public class BossEnemy : MonoBehaviour
 		animatorHashes = animator.parameters;
 		agent = GetComponentInChildren<NavMeshAgent>();
 		toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-		enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
 		currentTarget = transform.position;
 		agent.speed = patrollingSpeed;
 		isInAggroRadius = false;

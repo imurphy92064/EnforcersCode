@@ -23,7 +23,6 @@ public class MechEnemy : MonoBehaviour
     private const float maxHealth = 80.0f;
 
     private Transform PlayerTransform;
-    private EnemyController enemyController;
     private EnemyMechSoldier EnemyMechSoldierLOS;
     private ScoreText toScore;
 
@@ -70,10 +69,6 @@ public class MechEnemy : MonoBehaviour
         animatorHashes = animator.parameters;
         agent = GetComponent<NavMeshAgent>();
         toScore = GameObject.Find("Score").GetComponent<ScoreText>();
-        if (GameObject.Find("EnemyController") != null)
-        {
-            enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
-        }
         currentTarget = transform.position;
         agent.speed = patrollingSpeed;
         isInAggroRadius = false;

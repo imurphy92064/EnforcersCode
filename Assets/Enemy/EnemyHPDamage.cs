@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class EnemyHPDamage : MonoBehaviour {
 	public float maxHealth = 100f;
 	public float health;
-	public EnemyController enemyController;
 	public ScoreText toScore;
 	private GameObject explosion;
 	private bool handldedEnemyDeath;
@@ -14,7 +13,6 @@ public class EnemyHPDamage : MonoBehaviour {
 	// Use this for initialization
 	private void Start() {
 		health = maxHealth;
-		//enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
 		toScore = GameObject.Find("Score").GetComponent<ScoreText>();
 
 		var transforms = GetComponentsInChildren<Transform>();
