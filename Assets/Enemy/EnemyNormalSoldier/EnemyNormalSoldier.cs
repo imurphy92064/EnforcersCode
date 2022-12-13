@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyNormalSoldier : MonoBehaviour
 {
-    private Transform PlayerHead;
+    private Transform PlayerTransform;
     public float playerVisionRange;
 
     private Transform Eyesight;
@@ -17,13 +17,13 @@ public class EnemyNormalSoldier : MonoBehaviour
         LayerPlayer = LayerMask.NameToLayer("Player");
 
         //Grab player head
-        if (GameObject.Find("CameraRot") != null)
+        if (GameObject.Find("CenterOfMass") != null)
         {
-            PlayerHead = GameObject.Find("CameraRot").transform;
+            PlayerTransform = GameObject.Find("CenterOfMass").transform;
         }
         else
         {
-            PlayerHead = transform;
+            PlayerTransform = transform;
         }
 
         //References
@@ -49,22 +49,30 @@ public class EnemyNormalSoldier : MonoBehaviour
                     break;
             }
 
+        if (Eyesight == null)
+        {
+            Debug.LogError("No Eyesight on this enemy");
+        }
+
         //EnemyHP
         enemyHP = GetComponent<EnemyHP>();
-        enabled = false;
     }
 
     // Update is called once per frame
-    private void Update()
+    public void UpdateCustom()
     {
-        //Look at player
-        transform.LookAt(PlayerHead);
-        Eyesight.LookAt(PlayerHead);
-        var baseTransformAngles = transform.rotation.eulerAngles;
-        var EyesightAngles = Eyesight.rotation.eulerAngles;
-        transform.rotation = Quaternion.Euler(0f, baseTransformAngles.y, 0f);
-        Eyesight.rotation = Quaternion.Euler(EyesightAngles.x, EyesightAngles.y, EyesightAngles.z);
+        if (!(enemyHP.health <= 0))
+        {
+            //Look at player
+            transform.LookAt(PlayerTransform);
+            Eyesight.LookAt(PlayerTransform);
+            var baseTransformAngles = transform.rotation.eulerAngles;
+            var EyesightAngles = Eyesight.rotation.eulerAngles;
+            transform.rotation = Quaternion.Euler(0f, baseTransformAngles.y, 0f);
+            Eyesight.rotation = Quaternion.Euler(EyesightAngles.x, EyesightAngles.y, EyesightAngles.z);
+        }
 
+        /*
         //Bools to decide behavior
         var canSeePlayer = false;
         RaycastHit raycastHit;
@@ -83,12 +91,6 @@ public class EnemyNormalSoldier : MonoBehaviour
 
         //Shoot if we can see player
         if (canSeePlayer && !isDead) heldGun.TryShoot();
-
-        /*
-		 * 1. LOS of player
-		 * 2. Can I shoot
-		 * 3. Move
-		 * 4. Reload
-		 */
+        */
     }
 }

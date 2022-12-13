@@ -57,6 +57,7 @@ public class LungeEnemy : MonoBehaviour
     private float timePerPatrolTargetChange;
 
     private ScoreText toScore;
+    private EnemyNormalSoldier ems;
     /*
 	 * 12/6/22 Changes:
 	 *  1. Implemented the animation controls and triggers to play when the FastEnemy is moving in specific states.
@@ -72,10 +73,13 @@ public class LungeEnemy : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        //Grab EnemyNormalSoldier
+        ems = GetComponent<EnemyNormalSoldier>();
+
         //Grab player
-        if (GameObject.Find("Player") != null)
+        if (GameObject.Find("CenterOfMass") != null)
         {
-            PlayerTransform = GameObject.Find("Player").transform;
+            PlayerTransform = GameObject.Find("CenterOfMass").transform;
         }
         else
         {
@@ -98,6 +102,9 @@ public class LungeEnemy : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        //Do EnemyNormalSoldierBehavior
+        ems.UpdateCustom();
+
         //Add the time delta
         timeElapsed += Time.deltaTime;
 
@@ -197,7 +204,6 @@ public class LungeEnemy : MonoBehaviour
         //Point at player
         //Update to player position
         agent.speed = aggroSpeed;
-        transform.LookAt(PlayerTransform.position, Vector3.up);
         currentTarget = PlayerTransform.position;
     }
 
@@ -208,7 +214,6 @@ public class LungeEnemy : MonoBehaviour
         //Point at player
         //Update to player position
         agent.speed = 0.0f;
-        transform.LookAt(PlayerTransform.position, Vector3.up);
         currentTarget = PlayerTransform.position;
 
         //See if the time has gone past
@@ -229,7 +234,7 @@ public class LungeEnemy : MonoBehaviour
 
             if (movementStatus != LungeEnemyMovement.Dead)
             {
-                transform.LookAt(PlayerTransform.position, Vector3.up);
+                //transform.LookAt(PlayerTransform.position, Vector3.up);
                 heldGun.TryShoot();
             }
 

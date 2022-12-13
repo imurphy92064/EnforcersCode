@@ -7,7 +7,7 @@ public class BossEnemyAR : MonoBehaviour
     private BossEnemy parent;
 
     private void Start() {
-        parent = transform.parent.parent.parent.GetComponent<BossEnemy>(); //Small Changed, need to go up 1 parent in the tree
+        parent = transform.parent.GetComponent<BossEnemy>(); //Small Changed, need to go up 1 parent in the tree
     }
 
     private void OnTriggerEnter(Collider other) {

@@ -54,9 +54,9 @@ public class MechEnemy : MonoBehaviour
     private void Start()
     {
         //Grab player
-        if (GameObject.Find("Player") != null)
+        if (GameObject.Find("CenterOfMass") != null)
         {
-            PlayerTransform = GameObject.Find("Player").transform;
+            PlayerTransform = GameObject.Find("CenterOfMass").transform;
         }
         else
         {

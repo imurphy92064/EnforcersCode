@@ -3,24 +3,28 @@ using UnityEngine;
 public class EnemyMechSoldier : MonoBehaviour
 {
     public float playerVisionRange;
-    public Transform PlayerHead;
+    public Transform PlayerTransform;
     private Transform Eyesight;
     private GunSystem heldGun1;
     private GunSystem heldGun2;
     private EnemyHP enemyHP;
     private int LayerPlayer;
     private LayerMask WhatEnemyBulletsCanHit;
+    private EnemyNormalSoldier ems;
 
     private void Start()
     {
+        //Grab EnemyNormalSoldier
+        ems = GetComponent<EnemyNormalSoldier>();
+
         //Grab player head
-        if (GameObject.Find("CameraRot") != null)
+        if (GameObject.Find("CenterOfMass") != null)
         {
-            PlayerHead = GameObject.Find("CameraRot").transform;
+            PlayerTransform = GameObject.Find("CenterOfMass").transform;
         }
         else
         {
-            PlayerHead = transform;
+            PlayerTransform = transform;
         }
 
         WhatEnemyBulletsCanHit = LayerMask.GetMask("Ground", "Player");
@@ -51,14 +55,6 @@ public class EnemyMechSoldier : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        //Look at player
-        transform.LookAt(PlayerHead);
-        Eyesight.LookAt(PlayerHead);
-        var baseTransformAngles = transform.rotation.eulerAngles;
-        var EyesightAngles = Eyesight.rotation.eulerAngles;
-        transform.rotation = Quaternion.Euler(0f, baseTransformAngles.y, 0f);
-        Eyesight.rotation = Quaternion.Euler(EyesightAngles.x, EyesightAngles.y, EyesightAngles.z);
-
         //Bools to decide behavior
         var canSeePlayer = false;
         RaycastHit raycastHit;
@@ -75,18 +71,22 @@ public class EnemyMechSoldier : MonoBehaviour
 
         var isDead = enemyHP.health <= 0;
 
-        //Shoot if we can see player
-        if (canSeePlayer && !isDead)
+        if (!isDead)
         {
-            heldGun1.TryShoot();
-            heldGun2.TryShoot();
-        }
+            //Look at player
+            transform.LookAt(PlayerTransform);
+            Eyesight.LookAt(PlayerTransform);
+            var baseTransformAngles = transform.rotation.eulerAngles;
+            var EyesightAngles = Eyesight.localRotation.eulerAngles;
+            transform.rotation = Quaternion.Euler(0f, baseTransformAngles.y, 0f);
+            Eyesight.localRotation = Quaternion.Euler(EyesightAngles.x, EyesightAngles.y, EyesightAngles.z);
 
-        /*
-		 * 1. LOS of player
-		 * 2. Can I shoot
-		 * 3. Move
-		 * 4. Reload
-		 */
+            //Shoot if we can see player
+            if (canSeePlayer)
+            {
+                heldGun1.TryShoot();
+                heldGun2.TryShoot();
+            }
+        }
     }
 }
