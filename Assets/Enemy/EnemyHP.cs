@@ -116,11 +116,19 @@ public class EnemyHP : MonoBehaviour
 
     private void Update()
     {
-        //Update health
-        HealthBarText.text = health.ToString();
-        HealthBar.fillAmount = health / (float)MaxHealth;
+        //Update canvas
         EnemyCanvas.transform.position = CanvasPos.transform.position;
         EnemyCanvas.transform.rotation = CanvasPos.transform.rotation;
+
+        //Update health
+        HealthBar.fillAmount = health / (float)MaxHealth;
+        HealthBarText.text = health.ToString();
+        float HPPercent = (float)health / (float)MaxHealth;
+        float HPTextR = ((255f / 255f) * (0 + HPPercent)) + ((255f / 255f) * (1 - HPPercent));
+        float HPTextG = ((000f / 255f) * (0 + HPPercent)) + ((255f / 255f) * (1 - HPPercent));
+        float HPTextB = ((000f / 255f) * (0 + HPPercent)) + ((255f / 255f) * (1 - HPPercent));
+        float HPTextA = ((200f / 255f) * (0 + HPPercent)) + ((040f / 255f) * (1 - HPPercent));
+        HealthBarText.color = new Color(HPTextR, HPTextG, HPTextB, HPTextA);
     }
 
     public void takeDamage(int damage)
