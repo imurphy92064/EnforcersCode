@@ -12,5 +12,7 @@ public class SceneLoading
         Globals.hasBlueKey = false;
 
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+        Player.LockCursor();
     }
 }

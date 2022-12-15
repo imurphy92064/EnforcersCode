@@ -13,8 +13,7 @@ public class Menu : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        UnityEngine.Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Player.UnlockCursor();
         buttonWidth = 200;
         buttonHeight = 50;
         origin_x = Screen.width / 2 - buttonWidth / 2;
@@ -27,14 +26,9 @@ public class Menu : MonoBehaviour
         {
             SceneLoading.loadScene("Level1");
         }
-
         if (GUI.Button(new Rect(origin_x, origin_y + buttonHeight + 10, buttonWidth, buttonHeight), "Exit"))
         {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-				Application.Quit();
-#endif
+            Quit();
         }
         if (GUI.Button(new Rect(origin_x, origin_y + buttonHeight * 2 + 20, buttonWidth, buttonHeight), "Level 1"))
         {
@@ -48,6 +42,15 @@ public class Menu : MonoBehaviour
         {
             SceneLoading.loadScene("Level3");
         }
+    }
+
+    private void Quit()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 }
 
